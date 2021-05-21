@@ -14,7 +14,6 @@
 #renv:::renv_paths_cache()
 
 library("ggplot2")
-library("odbc")
 
 # Connect and write to database ================================================
 
