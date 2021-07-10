@@ -18,6 +18,9 @@ library("odbc")
 # Connect and write to database ================================================
 
 # wais_db_con <- odbc::dbConnect(odbc::odbc(), "WAIS_DataWarehouse")
+
+
+
 # 
 # mtcars$last_update <- as.character(Sys.time())
 # 
