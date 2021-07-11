@@ -37,9 +37,32 @@ ENV RENV_VERSION 0.13.2
 RUN R -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
-#COPY renv.lock ./docker-test/
-RUN R -e 'renv::restore(project = "docker-test")'
+# 
+COPY renv.lock /renv.lock 
+RUN R -e 'renv::restore()'
 
-CMD Rscript docker-test/test_script.R
+#RUN R -e 'renv::restore(project = "docker-test")'
+
+# Set directories
+# Make directory for exports
+RUN mkdir /Scripts
+RUN mkdir /Data
+
+# Copy script into container "COPY localfile pathinthecontainer"
+COPY /Scripts/test_script.R /Scripts/test_script.R
+
+# Execute script
+#CMD Rscript /Scripts/test_script.R
+
+RUN R -e 'getwd()'
+
+CMD R -e "source('/Scripts/test_script.R')"
+
+#CMD  Rscript /Scripts/test_script.R \
+ # && mv /Data /Data
 
 # Within test_script.R there is a need to access the web, access azure or athena databases, access private credentials etc.
+
+
+
+

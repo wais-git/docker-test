@@ -19,7 +19,23 @@ library("odbc")
 
 # wais_db_con <- odbc::dbConnect(odbc::odbc(), "WAIS_DataWarehouse")
 
-
+# odbc::dbConnect(odbc::odbc(),
+#                 Driver = "SQL Server",
+#                 Server = "tcp:waissql01.database.windows.net",
+#                 Database = "WAIS_DataWarehouse",
+#                 UID = "jfahey-gilmour",
+#                 PWD = key_get("JFG WAIS Cred", "jfahey-gilmour@wais.org.au"),
+#Port = 1433)
+#                   
+# 
+# 
+# library(keyring)
+# 
+# key_list()
+# key_get("JFG WAIS Cred")
+# key_set("JFG WAIS Cred", "jfahey-gilmour@wais.org.au")
+# 
+# ?dbConnect
 
 # 
 # mtcars$last_update <- as.character(Sys.time())
@@ -28,4 +44,4 @@ library("odbc")
 
 # Write back to environment ===================================================
 
-write.csv(mtcars, "mtcars.csv")
+write.csv(mtcars, "Data/mtcars.csv")
