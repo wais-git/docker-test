@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: delete_smartabase</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for delete_smartabase {neon}"><tr><td>delete_smartabase {neon}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>delete_smartabase</h2>
+
+<h3>Description</h3>
+
+<p>Deletes events using event ID
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+delete_smartabase(
+  url = NULL,
+  username = NULL,
+  password = NULL,
+  event_id,
+  cloud_mode = FALSE
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>url</code></td>
+<td>
+<p>string: Smartabase url e.g. 'example.smartabase.com/site'</p>
+</td></tr>
+<tr valign="top"><td><code>username</code></td>
+<td>
+<p>string: Smartabase username &ndash; ignore if setup with
+save_credentials()</p>
+</td></tr>
+<tr valign="top"><td><code>password</code></td>
+<td>
+<p>string: Smartabase password &ndash; ignore if setup with
+save_credentials()</p>
+</td></tr>
+<tr valign="top"><td><code>event_id</code></td>
+<td>
+<p>numeric: event IDs of events to be deleted</p>
+</td></tr>
+<tr valign="top"><td><code>cloud_mode</code></td>
+<td>
+<p>boolean: if TRUE, no progress bar appears (i.e. for use
+in non-local, cloud environments)</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function accepts Smartabase event IDs and deletes any records
+corresponding those event IDs
+<code>vignette("deleting-data", package = "neon")</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Smartabase data
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+# Delete one record with event_id = 999 from example.smartabase.com/site:
+delete_smartabase(
+  url = "example.smartabase.com/site",
+  username = "john.smith",
+  password = "examplePassword",
+  event_id = 999
+)
+
+## End(Not run)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>neon</em> version 0.1.20 <a href="00Index.html">Index</a>]</div>
+</body></html>

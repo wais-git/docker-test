@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Pulling Data: A Detailed Guide</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Pulling Data: A Detailed Guide</h1>
+
+
+
+<style>
+body, h1, h2, h3, h4 {
+    font-family: "Roboto";
+}
+</style>
+<p>If you haven’t already, please read the <code>installing-neon</code> and <code>getting-started</code> vignettes before proceeding. You can view them in a browser by typing <code>browseVignettes(&quot;neon&quot;)</code> or in RStudio with <code>vignette(&lt;name_of_vignette&gt;, package = &quot;neon&quot;)</code>.</p>
+<p><code>pull_smartabase()</code> contains several arguments that aim to make your workflow easier. This vignette will explain what the following arguments mean and how they can be used</p>
+<ul>
+<li><a href="#date_time">start_date / end_date / start_time / end_time</a></li>
+<li><a href="#last">last</a></li>
+<li><a href="#filter_user_value">filter_user_key / filter_user_value</a></li>
+<li><a href="#filter_data_value">filter_data_key / filter_data_value</a></li>
+<li><a href="#filter_data_condition">filter_data_condition</a></li>
+<li><a href="#putting_together">Putting it all together - filtering</a></li>
+<li><a href="#type">type</a></li>
+<li><a href="#synchronise">synchronise</a></li>
+<li><a href="#download_attachment">download_attachment</a></li>
+<li><a href="#include_missing_users">include_missing_users</a></li>
+<li><a href="#guess_col_type">guess_col_type</a></li>
+<li><a href="#cloud_mode">cloud_mode</a></li>
+<li><a href="#shiny_progress_code">shiny_progress_code</a></li>
+</ul>
+<div id="date_time" class="section level3">
+<h3>start_date / start_time / end_date / end_time</h3>
+<p>Whenever you pull data from an event form, you must supply “dd/mm/yyyy” dates to the <code>start_date</code> and <code>end_date</code> arguments, or you must supply a string to the <code>last</code> argument, which is looked at in the next section.</p>
+<p>When supplying dates to the <code>start_date</code> and <code>end_date</code> arguments, only records that were entered between these dates will be downloaded.</p>
+<p>You can also supply “h:mm AM” or “h:mm PM” values to the <code>start_time</code> and <code>end_time</code> arguments. Only records that were entered between these times will be downloaded. By default, <code>start_time</code> and <code>end_time</code> are ignored in the filtering process.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb1-2"><a href="#cb1-2"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example event form&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>  <span class="dt">start_date =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4"></a>  <span class="dt">end_date   =</span> <span class="st">&quot;31/04/2019&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5"></a>  <span class="dt">start_time =</span> <span class="st">&quot;9:15 AM&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6"></a>  <span class="dt">end_time   =</span> <span class="st">&quot;3:30 PM&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>)</span></code></pre></div>
+</div>
+<div id="last" class="section level3">
+<h3>last</h3>
+<p>If no dates are supplied to the <code>start_date</code> and <code>end_date</code> arguments, then you must supply a string to the <code>last</code> argument that indicates how many of the last <em>days</em>, <em>weeks</em>, <em>months</em> or <em>years</em> of data should be pulled for. For example, ‘7 days’. You can also simply supply the string ‘today’, which will download data with event dates equal to the current date. Note: if values are supplied to either <code>start_date</code> or <code>end_date</code>, <code>last</code> will be ignored.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="dt">last       =</span> <span class="st">&quot;7 days&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8"></a>  <span class="dt">last       =</span> <span class="st">&quot;10 weeks&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb2-12"><a href="#cb2-12"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="dt">last       =</span> <span class="st">&quot;3 months&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>)</span>
+<span id="cb2-15"><a href="#cb2-15"></a></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb2-17"><a href="#cb2-17"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb2-18"><a href="#cb2-18"></a>  <span class="dt">last       =</span> <span class="st">&quot;2 years&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19"></a>)</span>
+<span id="cb2-20"><a href="#cb2-20"></a></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb2-22"><a href="#cb2-22"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb2-23"><a href="#cb2-23"></a>  <span class="dt">last       =</span> <span class="st">&quot;today&quot;</span></span>
+<span id="cb2-24"><a href="#cb2-24"></a>)</span></code></pre></div>
+</div>
+<div id="filter_user_value" class="section level3">
+<h3>filter_user_key / filter_user_value</h3>
+<p><code>filter_user_key</code> and <code>filter_user_value</code> allow you to pull data for specific Smartabase users. If you don’t supply values to these arguments, data will be pulled for all athletes you have access to. This can result in messy data with missing values; e.g.</p>
+<pre><code>#&gt; # A tibble: 4 x 7
+#&gt;   date      form           user_id about        Distance   RPE entered_by_user_~
+#&gt;   &lt;chr&gt;     &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt; &lt;dbl&gt;             &lt;dbl&gt;
+#&gt; 1 &lt;NA&gt;      Example event~   31808 Charlie Tho~       NA    NA                NA
+#&gt; 2 &lt;NA&gt;      Example event~   31811 Jack Willia~       NA    NA                NA
+#&gt; 3 15/04/20~ Example event~   37201 Jamie Ander~     5411     7             37201
+#&gt; 4 &lt;NA&gt;      Example event~   37204 Liam Walker        NA    NA                NA</code></pre>
+<p>To pull data for certain users, supply <code>filter_user_key</code> with the type of user identification you would like to use; i.e. ‘about’, ‘user_id’, ‘username’ or ‘email’. <code>filter_user_value</code> then accepts the actual full names (i.e. about), user IDs, usernames or emails for the users you want to filter for.</p>
+<p>See the examples below for more details, where we assume you have set up your credentials using <code>save_credentials()</code>.</p>
+<div id="options" class="section level5">
+<h5>Options</h5>
+<p><strong>about</strong></p>
+<p>If <code>filter_user_key = &quot;about&quot;</code>, <code>filter_data_value</code> accepts <em>full names</em>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;about&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="dt">filter_user_value =</span> <span class="kw">c</span>(<span class="st">&quot;Aiden Thomas&quot;</span>, <span class="st">&quot;Jamie Anderson&quot;</span>),</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>)</span></code></pre></div>
+<p><strong>user_id</strong></p>
+<p>If <code>filter_user_key = &quot;user_id&quot;</code>, <code>filter_data_value</code> accepts Smartabase <em>user IDs</em>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;user_id&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="dt">filter_user_value =</span> <span class="kw">c</span>(<span class="dv">37204</span>, <span class="dv">37201</span>),</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>)</span></code></pre></div>
+<p><strong>username</strong></p>
+<p>If <code>filter_user_key = &quot;username&quot;</code>, <code>filter_data_value</code> accepts Smartabase <em>usernames</em>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;username&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="dt">filter_user_value =</span> <span class="kw">c</span>(<span class="st">&quot;aiden.thomas&quot;</span>, <span class="st">&quot;jamie.anderson&quot;</span>),</span>
+<span id="cb6-5"><a href="#cb6-5"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>)</span></code></pre></div>
+<p><strong>email</strong></p>
+<p>If <code>filter_user_key = &quot;email&quot;</code>, <code>filter_data_value</code> accepts users’ <em>emails</em>, as recorded on Smartabase.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb7-2"><a href="#cb7-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;email&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="dt">filter_user_value =</span> <span class="kw">c</span>(<span class="st">&quot;aiden.thomas@fusionsport.com&quot;</span>, <span class="st">&quot;jamie.anderson@fusionsport.com&quot;</span>),</span>
+<span id="cb7-5"><a href="#cb7-5"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>)</span></code></pre></div>
+<p><strong>current_group</strong></p>
+<p>If <code>filter_user_key = &quot;current_group&quot;</code>, the Smartabase API will look for whatever Smartabase group was loaded when you last logged into Smartabase. Data will then only be pulled for these users. <code>filter_user_value</code> is ignored.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb8-2"><a href="#cb8-2"></a>  <span class="dt">form            =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="dt">filter_user_key =</span> <span class="st">&quot;current_group&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="dt">start_date      =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5"></a>  <span class="dt">end_date        =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>)</span></code></pre></div>
+<p><strong>group</strong></p>
+<p>If <code>filter_user_key = &quot;group&quot;</code>, <code>filter_data_value</code> accepts the name of a Smartabase <code>group</code>. Data will then only be pulled for users in that Smartabase group.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Example event form&quot;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;group&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="dt">filter_user_value =</span> <span class="st">&quot;Demo Users&quot;</span>,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a>)</span></code></pre></div>
+<p>To see a list of Smartabase groups that you have access to, use the <code>get_group()</code> function. For more details, see the <code>helper-functions</code> vignette.</p>
+</div>
+</div>
+<div id="filter_data_value" class="section level3">
+<h3>filter_data_key / filter_data_value</h3>
+<p><code>filter_data_key</code> and <code>filter_data_value</code> allow you to filter the data according to certain rules.</p>
+<p>For example, if you had a “Training Log” form with an “Duration” field, and you only want to pull data where Duration was equal to “35”, your <code>pull_smartabase()</code> call may look like this</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb10-2"><a href="#cb10-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb10-3"><a href="#cb10-3"></a>  <span class="dt">filter_data_key   =</span> <span class="st">&quot;Duration&quot;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4"></a>  <span class="dt">filter_data_value =</span> <span class="st">&quot;35&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb10-6"><a href="#cb10-6"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>)</span></code></pre></div>
+<p>As you can see, <code>filter_data_key</code> accepts the name of a field in your form of interest; in this case, “Duration”. <code>filter_data_value</code> then accepts the Duration value you want to filter for; in this case, “35”.</p>
+</div>
+<div id="filter_data_condition" class="section level3">
+<h3>filter_data_condition</h3>
+<p>By default, records that are <em>equal to</em> <code>filter_data_value</code> will be downloaded. However, you may want to pull records where, for example, Duration is greater than “35”. You can achieve this by supplying “greater_than” to the <code>filter_data_condition</code> argument:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="dt">filter_data_key       =</span> <span class="st">&quot;Duration&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4"></a>  <span class="dt">filter_data_value     =</span> <span class="st">&quot;35&quot;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5"></a>  <span class="dt">filter_data_condition =</span> <span class="st">&quot;greater_than&quot;</span> <span class="co"># alternatively, &quot;&gt;&quot;</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb11-7"><a href="#cb11-7"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a>)</span></code></pre></div>
+<p><code>filter_data_condition</code> accepts any of the following values</p>
+<ul>
+<li>“equal_to” or “=”</li>
+<li>“not_equal_to” or “!=”</li>
+<li>“greater_than” or “&gt;”</li>
+<li>“less_than” or “&lt;”</li>
+<li>“greater_than_or_equal_to” or “&gt;=”</li>
+<li>“less_than_or_equal_to” or “&lt;=”</li>
+<li>“contains” or “%in%”</li>
+</ul>
+<p>Note that the greater_than, greater_than_or_equal_to, less_than and less_than_or_equal_to operators will only work on number fields.</p>
+<p>You may also use multiple filters in the same call to <code>pull_smartabase()</code>. Keep in mind that when using multiple filters, only rows that match all conditions will be returned. So for instance, in the below example, the only records that would be returned are those where Duration is below 25 AND where RPE is also greater than or equal to 6:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>  <span class="dt">filter_data_key       =</span> <span class="kw">c</span>(<span class="st">&quot;Duration&quot;</span>, <span class="st">&quot;RPE&quot;</span>),</span>
+<span id="cb12-4"><a href="#cb12-4"></a>  <span class="dt">filter_data_value     =</span> <span class="kw">c</span>(<span class="st">&quot;25&quot;</span>, <span class="st">&quot;6&quot;</span>),</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  <span class="dt">filter_data_condition =</span> <span class="kw">c</span>(<span class="st">&quot;&lt;&quot;</span>, <span class="st">&quot;&gt;=&quot;</span>), <span class="co"># alternatively, c(&quot;less_than&quot;, &quot;greater_than_or_equal_to&quot;)</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb12-7"><a href="#cb12-7"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>)</span></code></pre></div>
+<p>Note that <code>filter_data_key</code>, <code>filter_data_condition</code> and <code>filter_data_value</code> must be the same length, although in certain situations <code>pull_smartabase()</code> will try to ensure they are the same length for you, as outlined below.</p>
+<ol style="list-style-type: decimal">
+<li>There cannot be duplicate <code>filter_data_key</code> elements, e.g. <code>filter_data_key = c(&quot;Duration&quot;, &quot;Duration&quot;)</code>. This makes sense when you think about it, since no record can match multiple conditions for the same field. It follows from this that when <code>field_data_key</code> is length == 1, then <code>filter_data_condition</code> and <code>filter_data_value</code> must both be length == 1.</li>
+<li>If <code>filter_data_key</code> is length &gt; 1, is the same length as <code>filter_data_condition</code>, and <code>filter_data_value</code> is length == 1, then <code>filter_data_value</code> will be replicated to match the length of <code>filter_data_key</code>.</li>
+<li>If <code>filter_data_key</code> is length &gt; 1, is the same length as <code>filter_data_value</code>, and <code>filter_data_condition</code> is length == 1, then <code>filter_data_condition</code> will be replicated to match the length of <code>filter_data_key</code>.</li>
+<li>Finally, if <code>filter_data_key</code> is length &gt; 1 and both <code>filter_data_condition</code> and <code>filter_data_value</code> are length == 1, then <code>filter_data_condition</code> and <code>filter_data_value</code> will be replicated to match the length of <code>filter_data_key</code>.</li>
+</ol>
+<p>Below are some examples to make it clearer. The first example is a valid query and will return records where both Duration and RPE are less than 6.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb13-3"><a href="#cb13-3"></a>  <span class="dt">filter_data_key       =</span> <span class="kw">c</span>(<span class="st">&quot;Duration&quot;</span>, <span class="st">&quot;RPE&quot;</span>),</span>
+<span id="cb13-4"><a href="#cb13-4"></a>  <span class="dt">filter_data_value     =</span> <span class="kw">c</span>(<span class="st">&quot;25&quot;</span>, <span class="st">&quot;6&quot;</span>)</span>
+<span id="cb13-5"><a href="#cb13-5"></a>  <span class="dt">filter_data_condition =</span> <span class="kw">c</span>(<span class="st">&quot;&lt;&quot;</span>)</span>
+<span id="cb13-6"><a href="#cb13-6"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb13-7"><a href="#cb13-7"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>)</span></code></pre></div>
+<p>Likewise, below is another valid query that will return records where Duration and RPE are both equal to 7 (since <code>filter_data_condition</code> defaults to “equal_to”)</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3"></a>  <span class="dt">filter_data_key       =</span> <span class="kw">c</span>(<span class="st">&quot;Duration&quot;</span>, <span class="st">&quot;RPE&quot;</span>),</span>
+<span id="cb14-4"><a href="#cb14-4"></a>  <span class="dt">filter_data_value     =</span> <span class="kw">c</span>(<span class="st">&quot;7&quot;</span>),</span>
+<span id="cb14-5"><a href="#cb14-5"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb14-6"><a href="#cb14-6"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a>)</span></code></pre></div>
+<p>The next example will return an error, since there is only one element in <code>filter_data_key</code> but multiple elements in <code>filter_data_value</code>. If <code>pull_smartabase()</code> replicated <code>filter_data_key</code> to be the same length as <code>filter_data_value</code>, it would result in duplicate elements in <code>filter_data_key</code>, which is not possible.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb15-2"><a href="#cb15-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb15-3"><a href="#cb15-3"></a>  <span class="dt">filter_data_key       =</span> <span class="kw">c</span>(<span class="st">&quot;Duration&quot;</span>),</span>
+<span id="cb15-4"><a href="#cb15-4"></a>  <span class="dt">filter_data_value     =</span> <span class="kw">c</span>(<span class="st">&quot;7&quot;</span>, <span class="st">&quot;25&quot;</span>),</span>
+<span id="cb15-5"><a href="#cb15-5"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb15-6"><a href="#cb15-6"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a>)</span></code></pre></div>
+<p>Finally, the next example will also return an error since <code>filter_data_condition</code> has length == 3 whereas <code>filter_data_key</code> and <code>filter_data_value</code> have length == 2.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>  <span class="dt">filter_data_key       =</span> <span class="kw">c</span>(<span class="st">&quot;Duration&quot;</span>, <span class="st">&quot;RPE&quot;</span>),</span>
+<span id="cb16-4"><a href="#cb16-4"></a>  <span class="dt">filter_data_condition =</span> <span class="kw">c</span>(<span class="st">&quot;=&quot;</span>, <span class="st">&quot;&lt;&quot;</span>, <span class="st">&quot;&gt;=&quot;</span>)</span>
+<span id="cb16-5"><a href="#cb16-5"></a>  <span class="dt">filter_data_value     =</span> <span class="kw">c</span>(<span class="st">&quot;7&quot;</span>, <span class="st">&quot;25&quot;</span>),</span>
+<span id="cb16-6"><a href="#cb16-6"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb16-7"><a href="#cb16-7"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb16-8"><a href="#cb16-8"></a>)</span></code></pre></div>
+</div>
+<div id="putting_together" class="section level3">
+<h3>Putting it all together - filtering</h3>
+<p>Below are some examples of filtering for both multiple users and multiple conditions in the one <code>pull_smartabase()</code> call.</p>
+<p>Imagine we want to pull data from a Training Log form that has a Duration field and an RPE field</p>
+<p><img src="data:image/png;base64,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" width="553" style="border:0;" /></p>
+<div id="example-1" class="section level4">
+<h4>Example 1</h4>
+<p>If we want to filter for 1) “Aiden Thomas” and “Jamie Anderson”, using their emails, and 2) records where Duration is less than “25” minutes and RPE is greater than or equal to “6”, then our <code>pull_smartabase()</code> call would look like this</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb17-2"><a href="#cb17-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb17-3"><a href="#cb17-3"></a>  <span class="dt">filter_user_key       =</span> <span class="st">&quot;email&quot;</span>,</span>
+<span id="cb17-4"><a href="#cb17-4"></a>  <span class="dt">filter_user_value     =</span> <span class="kw">c</span>(<span class="st">&quot;aiden.thomas@fusionsport.com&quot;</span>, <span class="st">&quot;jamie.anderson@fusionsport.com&quot;</span>),</span>
+<span id="cb17-5"><a href="#cb17-5"></a>  <span class="dt">filter_data_key       =</span> <span class="kw">c</span>(<span class="st">&quot;Duration&quot;</span>, <span class="st">&quot;RPE&quot;</span>),</span>
+<span id="cb17-6"><a href="#cb17-6"></a>  <span class="dt">filter_data_value     =</span> <span class="kw">c</span>(<span class="st">&quot;25&quot;</span>, <span class="st">&quot;6&quot;</span>),</span>
+<span id="cb17-7"><a href="#cb17-7"></a>  <span class="dt">filter_data_condition =</span> <span class="kw">c</span>(<span class="st">&quot;&lt;&quot;</span>, <span class="st">&quot;&gt;=&quot;</span>), <span class="co"># alternatively, c(&quot;less_than&quot;, &quot;greater_than_or_equal_to&quot;)</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb17-9"><a href="#cb17-9"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a>)</span></code></pre></div>
+</div>
+<div id="example-2" class="section level4">
+<h4>Example 2</h4>
+<p>Let’s say we now want to pull data for 1) “Aiden Thomas” and “Jamie Anderson”, using their full names and 2) records where Duration is <em>not equal</em> to “50” minutes and RPE <em>contains</em> the word “Hard”</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb18-2"><a href="#cb18-2"></a>  <span class="dt">form                  =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb18-3"><a href="#cb18-3"></a>  <span class="dt">filter_user_key       =</span> <span class="st">&quot;email&quot;</span>,</span>
+<span id="cb18-4"><a href="#cb18-4"></a>  <span class="dt">filter_user_value     =</span> <span class="kw">c</span>(<span class="st">&quot;Aiden Thomas&quot;</span>, <span class="st">&quot;Jamie Anderson&quot;</span>),</span>
+<span id="cb18-5"><a href="#cb18-5"></a>  <span class="dt">filter_data_key       =</span> <span class="kw">c</span>(<span class="st">&quot;Duration&quot;</span>, <span class="st">&quot;RPE&quot;</span>),</span>
+<span id="cb18-6"><a href="#cb18-6"></a>  <span class="dt">filter_data_value     =</span> <span class="kw">c</span>(<span class="st">&quot;50&quot;</span>, <span class="st">&quot;Hard&quot;</span>),</span>
+<span id="cb18-7"><a href="#cb18-7"></a>  <span class="dt">filter_data_condition =</span> <span class="kw">c</span>(<span class="st">&quot;!=&quot;</span>, <span class="st">&quot;%in%&quot;</span>), <span class="co"># alternatively, c(&quot;not_equal_to&quot;, &quot;contains&quot;)</span></span>
+<span id="cb18-8"><a href="#cb18-8"></a>  <span class="dt">start_date            =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb18-9"><a href="#cb18-9"></a>  <span class="dt">end_date              =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb18-10"><a href="#cb18-10"></a>)</span></code></pre></div>
+</div>
+</div>
+<div id="type" class="section level3">
+<h3>type</h3>
+<p>By default, <code>pull_smartabase()</code> expects to pull data from an event form, so <code>type = &quot;event&quot;</code>. To pull from a profile form, set <code>type = &quot;profile&quot;</code>.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb19-2"><a href="#cb19-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Example profile form&quot;</span>,</span>
+<span id="cb19-3"><a href="#cb19-3"></a>  <span class="dt">type              =</span> <span class="st">&quot;profile&quot;</span>,</span>
+<span id="cb19-4"><a href="#cb19-4"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;about&quot;</span>,</span>
+<span id="cb19-5"><a href="#cb19-5"></a>  <span class="dt">filter_user_value =</span> <span class="kw">c</span>(<span class="st">&quot;Aiden Thomas&quot;</span>, <span class="st">&quot;Jamie Anderson&quot;</span>),</span>
+<span id="cb19-6"><a href="#cb19-6"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb19-7"><a href="#cb19-7"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb19-8"><a href="#cb19-8"></a>)</span></code></pre></div>
+<p><code>type</code> can also be set to <code>type = &quot;synchronise&quot;</code>, which will be looked at in the next section.</p>
+</div>
+<div id="synchronise" class="section level3">
+<h3>synchronise</h3>
+<p>Setting <code>type = &quot;synchronise&quot;</code> is a way to determine which records have been entered into a Smartabase form after a certain time. Here is the general workflow for synchronising with a Smartabase form.</p>
+<p>The first time you synchronise, your <code>pull_smartabase()</code> call might look like this:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>synchronise_example &lt;-<span class="st"> </span><span class="kw">pull_smartabase</span>(</span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example profile form&quot;</span>,</span>
+<span id="cb20-3"><a href="#cb20-3"></a>  <span class="dt">type       =</span> <span class="st">&quot;synchronise&quot;</span>,</span>
+<span id="cb20-4"><a href="#cb20-4"></a>  <span class="dt">start_date =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb20-5"><a href="#cb20-5"></a>  <span class="dt">end_date   =</span> <span class="st">&quot;31/04/2019&quot;</span></span>
+<span id="cb20-6"><a href="#cb20-6"></a>)</span></code></pre></div>
+<p>This will return a list with three elements. The first element will be all the records that exist in the form; the second element will be the current time (unix time); and the third element will the event ID of all records that have been deleted from that form.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">print</span>(synchronise_example)</span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="co">#&gt; $new_data</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; # A tibble: 4 x 8</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="co">#&gt;   about    user_id form      start_date Distance   RPE entered_by_user~ event_id</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a><span class="co">#&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="co">#&gt; 1 Charlie~   31808 Example ~ 15/04/2019     5411     7            37201    16517</span></span>
+<span id="cb21-7"><a href="#cb21-7"></a><span class="co">#&gt; 2 Jack Wi~   31811 Example ~ 15/04/2019     2374     3            37201    36505</span></span>
+<span id="cb21-8"><a href="#cb21-8"></a><span class="co">#&gt; 3 Jamie A~   37201 Example ~ 15/04/2019     1600     6            37201    36014</span></span>
+<span id="cb21-9"><a href="#cb21-9"></a><span class="co">#&gt; 4 Liam Wa~   37204 Example ~ 15/04/2019     2564     5            37201    28970</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a><span class="co">#&gt; </span></span>
+<span id="cb21-11"><a href="#cb21-11"></a><span class="co">#&gt; $last_sync_time</span></span>
+<span id="cb21-12"><a href="#cb21-12"></a><span class="co">#&gt; [1] 1.588855e+12</span></span>
+<span id="cb21-13"><a href="#cb21-13"></a><span class="co">#&gt; </span></span>
+<span id="cb21-14"><a href="#cb21-14"></a><span class="co">#&gt; $deleted_events</span></span>
+<span id="cb21-15"><a href="#cb21-15"></a><span class="co">#&gt; [1] 991 992 993</span></span></code></pre></div>
+<p>Now, the next time you synchronise with that form, you can use the last_sync_time to determine any new records that have been entered into that form since the last time you synched (i.e., the events that have been entered into the form after the last_sync_time).</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>next_sync_example &lt;-<span class="st"> </span><span class="kw">pull_smartabase</span>(</span>
+<span id="cb22-2"><a href="#cb22-2"></a>  <span class="dt">form           =</span> <span class="st">&quot;Example profile form&quot;</span>,</span>
+<span id="cb22-3"><a href="#cb22-3"></a>  <span class="dt">type           =</span> <span class="st">&quot;synchronise&quot;</span>,</span>
+<span id="cb22-4"><a href="#cb22-4"></a>  <span class="dt">last           =</span> <span class="st">&quot;1 years&quot;</span>,</span>
+<span id="cb22-5"><a href="#cb22-5"></a>  <span class="dt">start_date     =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb22-6"><a href="#cb22-6"></a>  <span class="dt">end_date       =</span> <span class="st">&quot;31/04/2019&quot;</span>,</span>
+<span id="cb22-7"><a href="#cb22-7"></a>  <span class="dt">last_sync_time =</span> synchronise_example<span class="op">$</span>last_sync_time</span>
+<span id="cb22-8"><a href="#cb22-8"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">print</span>(next_sync_example)</span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="co">#&gt; $new_data</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="co">#&gt; # A tibble: 1 x 8</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a><span class="co">#&gt;   about    user_id form      start_date Distance   RPE entered_by_user~ event_id</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a><span class="co">#&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb23-6"><a href="#cb23-6"></a><span class="co">#&gt; 1 Jamie A~   37201 Example ~ 18/04/2019     3100     7            37201    62331</span></span>
+<span id="cb23-7"><a href="#cb23-7"></a><span class="co">#&gt; </span></span>
+<span id="cb23-8"><a href="#cb23-8"></a><span class="co">#&gt; $last_sync_time</span></span>
+<span id="cb23-9"><a href="#cb23-9"></a><span class="co">#&gt; [1] 1.588856e+12</span></span>
+<span id="cb23-10"><a href="#cb23-10"></a><span class="co">#&gt; </span></span>
+<span id="cb23-11"><a href="#cb23-11"></a><span class="co">#&gt; $deleted_events</span></span>
+<span id="cb23-12"><a href="#cb23-12"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
+<p>So why is this useful? By querying which records have been entered into a form beyond a certain time, you can set up workflows that automatically trigger R scripts whenever new data is detected. For more information on how to achieve this, contact Fusion Sport.</p>
+</div>
+<div id="download_attachment" class="section level3">
+<h3>download_attachment</h3>
+<p>If you are pulling from a form that contains a file upload field, then you can download those files to your local machine by setting the <code>download_attachment = TRUE</code>. When you then run <code>pull_smartabase()</code>, you will not only retrieve the data that lives in the form, but the files that were uploaded to the file upload field/s will be downloaded to your current directory.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb24-2"><a href="#cb24-2"></a>  <span class="dt">form                =</span> <span class="st">&quot;Example form&quot;</span>,</span>
+<span id="cb24-3"><a href="#cb24-3"></a>  <span class="dt">download_attachment =</span> <span class="ot">TRUE</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a>  <span class="dt">start_date          =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb24-5"><a href="#cb24-5"></a>  <span class="dt">end_date            =</span> <span class="st">&quot;31/04/2019&quot;</span>                </span>
+<span id="cb24-6"><a href="#cb24-6"></a>)</span></code></pre></div>
+<pre><code>#&gt; Example form is downloading...
+#&gt; |===================================================================| 100%
+#&gt; Dowloading 1 attachment from Example form...
+#&gt; Authentication success: (200) ok
+#&gt; Example form download successful: 1 rows retrieved
+#&gt; Example form attachment download successful: 1 out of 1 files (1mb total) saved to C:/Users/ZacPross/Example_directory</code></pre>
+<pre><code>#&gt; # A tibble: 1 x 12
+#&gt;   about user_id form  start_date File  Distance   RPE entered_by_user~ event_id
+#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 Jami~   37201 Exam~ 18/04/2019 1234~     3100     7            37201    62331
+#&gt; # ... with 3 more variables: file_name &lt;chr&gt;, attachment_url &lt;chr&gt;, name &lt;chr&gt;</code></pre>
+</div>
+<div id="include_missing_users" class="section level3">
+<h3>include_missing_users</h3>
+<p>By default, data will be pulled only for those users who have entered data in the form of interest while accounting for the filtering conditions. However, there may be instances where you want to see which users have not entered any data – for instance, for data quality analysis purposes. To do this, simply set <code>include_missing_users = TRUE</code> and all users that meet your user filtering conditions will be included in the returned data frame, however they will appear as a row of NA values.</p>
+<pre><code>#&gt; # A tibble: 4 x 8
+#&gt;   about    user_id form      start_date Distance   RPE entered_by_user~ event_id
+#&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 Charlie~   31808 Example ~ 15/04/2019     5411     7            37201    16517
+#&gt; 2 Jack Wi~   31811 Example ~ 15/04/2019     2374     3            37201    36505
+#&gt; 3 Jamie A~   37201 &lt;NA&gt;      &lt;NA&gt;             NA    NA               NA       NA
+#&gt; 4 Liam Wa~   37204 &lt;NA&gt;      &lt;NA&gt;             NA    NA               NA       NA</code></pre>
+<p>Above, users 3 and 4 (Jamie Anderson and Liam Walker) haven’t entered any data.</p>
+</div>
+<div id="guess_col_type" class="section level3">
+<h3>guess_col_type</h3>
+<p>By default, <code>pull_smartabase()</code> guesses the data type of each column and appends the guess to the top of each column. For example,</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb28-2"><a href="#cb28-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb28-3"><a href="#cb28-3"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb28-5"><a href="#cb28-5"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;about&quot;</span>,</span>
+<span id="cb28-6"><a href="#cb28-6"></a>  <span class="dt">filter_user_value =</span> <span class="st">&quot;Charlie Thompson&quot;</span></span>
+<span id="cb28-7"><a href="#cb28-7"></a>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1 x 9
+#&gt;   about user_id form  start_date `Date of Sessio~ Distance   RPE
+#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;               &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 Char~   31808 Exam~ 15/04/2019 15/04/2019           5411     7
+#&gt; # ... with 2 more variables: entered_by_user_id &lt;dbl&gt;, event_id &lt;dbl&gt;</code></pre>
+<p>Notice how in the tibble above the <code>about</code> column has <code>&lt;chr&gt;</code> at the top (meaning that the column contains character data) and the <code>Distance</code> column has <code>&lt;dbl&gt;</code> at the top (meaning that the column contains numeric data).</p>
+<p>However, if you do not want <code>pull_smartabase()</code> to guess the column types and would like everything to come through as character types, simply set <code>guess_col_type = FALSE</code>.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="kw">pull_smartabase</span>(</span>
+<span id="cb30-2"><a href="#cb30-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb30-3"><a href="#cb30-3"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb30-4"><a href="#cb30-4"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb30-5"><a href="#cb30-5"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;about&quot;</span>,</span>
+<span id="cb30-6"><a href="#cb30-6"></a>  <span class="dt">filter_user_value =</span> <span class="st">&quot;Charlie Thompson&quot;</span>,</span>
+<span id="cb30-7"><a href="#cb30-7"></a>  <span class="dt">guess_col_type    =</span> <span class="ot">FALSE</span></span>
+<span id="cb30-8"><a href="#cb30-8"></a>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1 x 9
+#&gt;   about user_id form  start_date `Date of Sessio~ Distance RPE  
+#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;
+#&gt; 1 Char~   31808 Exam~ 15/04/2019 1555288875000    5411     7    
+#&gt; # ... with 2 more variables: entered_by_user_id &lt;dbl&gt;, event_id &lt;dbl&gt;</code></pre>
+<p>Notice how the <code>Distance</code> column is now <code>&lt;chr&gt;</code>, whereas before it was <code>&lt;dbl&gt;</code>.</p>
+<p>A few other things to note:</p>
+<ol style="list-style-type: decimal">
+<li>The metadata columns <code>user_id</code>, <code>entered_by_user_id</code> and <code>event_id</code> are not affected by the <code>guess_col_type</code> argument – they will always come through as numeric.</li>
+<li><code>Date of Session</code> is actually a Smartabase date field and so</li>
+</ol>
+<ul>
+<li>When <code>guess_col_type = FALSE</code>, all Smartabase date fields are pulled through in the form of “epoch type”; that is, the number of milliseconds that have elapsed since 00:00:00, 1 January 1970.</li>
+<li>When <code>guess_col_type = TRUE</code>, <code>pull_smartabase()</code> searches for any field names with the word “date” in it whose values are a string of digits. If your local machine is set to American time, this date will be converted to mm/dd/yyyy format; machines in other timezones will return dd/mm/yyyy format. Therefore, if you desire non-event date fields to display a regular date format, it is imperative that <code>guess_col_type = TRUE</code>, the field name on Smartabase contains the word “date” in it and that your computer’s timezone is set correctly.</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Event dates, converted Smartabase date fields or any Smartabase fields that contain some kind of date data will always be pulled as character types. The reason for this is that if you want to push date data back up to Smartabase, it must be character type (i.e. required by the Smartabase API).</li>
+</ol>
+</div>
+<div id="cloud_mode" class="section level3">
+<h3>cloud_mode</h3>
+<p><code>pull_smartabase()</code> accepts an input called <code>cloud_mode</code>. If <code>cloud_mode = TRUE</code>, no progress bar will be printed to screen. This is for when the package is being run on cloud instances in an automated fashion. Furthermore, any error logs are printed rather than saved to a text file.</p>
+</div>
+<div id="shiny_progress_code" class="section level3">
+<h3>shiny_progress_code</h3>
+<p>You will notice that when you pull data into RStudio with pull_smartabase(), a progress bar will appear in the console that roughly displays the percentage of data left to download.</p>
+<p>It would be useful if this progress bar can be passed to shiny apps that utilise pull_smartabase(), given the typical way to show progress bars in shiny is to essentially fake it; that is, to step the progress bar according to some arbitrary function that doesn’t actually represent the state of the download – see <a href="https://shiny.rstudio.com/articles/progress.html">here</a>.</p>
+<p>The problem is that the progress bar in pull_smartabase() is printed to screen, but to work with a shiny app it needs to accept the shiny app’s session ID. Thankfully, there is a package called <code>shinyhttr</code> that achieves this: <a href="https://github.com/curso-r/shinyhttr">shinyhttr github</a>.</p>
+<p>To pass the progress bar to a shinyapp, you firstly must install <code>shinyhttr</code> and <code>shinyWidgets</code> and load them in your app. Second, you must pass the bare <code>shinyhttr</code> code for producing a shiny progress bar to the <code>shiny_progress_code</code> argument in <code>pull_smartabase()</code>. Let’s say you also have a button called <code>get_data</code> in your app, where clicking on that button triggers <code>pull_smartabase()</code>. Your reactive function for pulling data in a shiny app might then look like this:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>input_data &lt;-<span class="st"> </span><span class="kw">eventReactive</span>(input<span class="op">$</span>get_data, {</span>
+<span id="cb32-2"><a href="#cb32-2"></a>  <span class="kw">pull_smartabase</span>(</span>
+<span id="cb32-3"><a href="#cb32-3"></a>    <span class="dt">form =</span> <span class="st">&quot;Example form&quot;</span>,</span>
+<span id="cb32-4"><a href="#cb32-4"></a>    <span class="dt">start_date =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb32-5"><a href="#cb32-5"></a>    <span class="dt">end_date =</span> <span class="st">&quot;30/04/2019&quot;</span>,</span>
+<span id="cb32-6"><a href="#cb32-6"></a>    <span class="dt">shiny_progress_code =</span> shinyhttr<span class="op">::</span><span class="kw">progress</span>(session, <span class="dt">id =</span> <span class="st">&quot;get_data_progress&quot;</span>)</span>
+<span id="cb32-7"><a href="#cb32-7"></a>  )</span>
+<span id="cb32-8"><a href="#cb32-8"></a>})</span></code></pre></div>
+<p>The key features being that you must use <code>shinyhttr::progress()</code> rather than just <code>progress()</code>, you must pass your shiny app’s session ID (by default it is just called <code>session</code>), and you must give your shinyhttr progress bar an id (in this case, <code>get_data_progress</code>).</p>
+<p>Next step is to add the progress bar to your UI, which might look like this:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>shinyWidgets<span class="op">::</span><span class="kw">progressBar</span>(</span>
+<span id="cb33-2"><a href="#cb33-2"></a>  <span class="dt">id =</span> <span class="st">&quot;get_data_progress&quot;</span>,</span>
+<span id="cb33-3"><a href="#cb33-3"></a>  <span class="dt">value =</span> <span class="dv">0</span>,</span>
+<span id="cb33-4"><a href="#cb33-4"></a>  <span class="dt">title =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb33-5"><a href="#cb33-5"></a>  <span class="dt">display_pct =</span> <span class="ot">TRUE</span></span>
+<span id="cb33-6"><a href="#cb33-6"></a>)</span></code></pre></div>
+<p>Note how the id in the UI code matches the id in the <code>eventReactive()</code>.</p>
+<p>Final note, the <code>shiny_progress_code</code> argument will still produce a progress bar in a shiny app even if <code>cloud_mode = TRUE</code>; i.e., only the regular <code>httr::progress()</code> that prints to the console will be suppressed when <code>cloud_mode = TRUE</code>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

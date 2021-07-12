@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Pushing Data: A Detailed Guide</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Pushing Data: A Detailed Guide</h1>
+
+
+
+<style>
+body, h1, h2, h3, h4 {
+    font-family: "Roboto";
+}
+</style>
+<p>If you haven’t already, please read the <code>installing-neon</code>, <code>getting-started</code> and <code>pulling-data</code> vignettes before proceeding. You can view them in a browser by typing <code>browseVignettes(&quot;neon&quot;)</code> or in RStudio with <code>vignette(&lt;name_of_vignette&gt;, package = &quot;neon&quot;)</code>.</p>
+<p><code>push_smartabase()</code> contains several arguments that aim to make your workflow easier. This vignette will explain what the following arguments mean and how they can be used:</p>
+<ul>
+<li><a href="#edit_event">edit_event</a></li>
+<li><a href="#match_id_to_column">get_id / match_id_to_column</a></li>
+<li><a href="#table_fields">table_fields</a></li>
+<li><a href="#current_date_format">current_date_format</a></li>
+<li><a href="#end_time">start_date / end_date / start_time / end_time</a></li>
+<li><a href="#type">type</a></li>
+<li><a href="#cloud_mode">cloud_mode</a></li>
+<li><a href="#shiny_progress_code">shiny_progress_code</a></li>
+</ul>
+<div id="edit_event" class="section level3">
+<h3>edit_event</h3>
+<p>We envisage that a common workflow using <code>push_smartabase()</code> will involve downloading data from Smartabase, doing analysis, and then uploading the results back up to Smartabase. And so rather than upload the results into a new record, perhaps we would like the results to populate some of the fields in the original records. This is where the <code>edit_event</code> argument comes in.</p>
+<p><strong>Warning: editing events comes with significant risks if used improperly. While <code>edit_event = TRUE</code>, if you push data that does not include a given field that does in fact exist in the Smartabase form, then those fields will be overwritten with empty values in Smartabase. Read on for more details</strong></p>
+<p>In order to edit or update an existing record, you will need each record’s <code>event_id</code>. This can be attained when you pull data from Smartabase, like so</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>training_data &lt;-<span class="st"> </span><span class="kw">pull_smartabase</span>(</span>
+<span id="cb1-2"><a href="#cb1-2"></a>  <span class="dt">form       =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3"></a>  <span class="dt">start_date =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4"></a>  <span class="dt">end_date   =</span> <span class="st">&quot;15/04/2019&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 2 x 7
+#&gt;   start_date user_id event_id about          distance   RPE `Average Distance`
+#&gt;   &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;             
+#&gt; 1 15/04/2019   37204  2381840 Aiden Thomas       2530     5 NA                
+#&gt; 2 15/04/2019   37201  2382033 Jamie Anderson     5411     7 NA</code></pre>
+<p>We have two records with <code>event_id = 2381840</code> and <code>event_id = 238203</code>.</p>
+<p>Notice that the field “Average Distance” is currently empty. Let’s imagine we want to populate that field with the team’s average distance in metres, without creating new records. First, let’s do the calculation</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Need to load dplyr</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a>avg_dist_data &lt;-<span class="st"> </span>training_data <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="st">  </span><span class="kw">mutate_at</span>(<span class="st">&quot;Average Distance&quot;</span>, <span class="op">~</span><span class="st"> </span><span class="kw">round</span>(<span class="kw">mean</span>(distance), <span class="dv">1</span>))</span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a>avg_dist_data</span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; # A tibble: 2 x 7</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt;   start_date user_id event_id about          distance   RPE `Average Distance`</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;              &lt;dbl&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt; 1 15/04/2019   37204  2381840 Aiden Thomas       2530     5              3970.</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt; 2 15/04/2019   37201  2382033 Jamie Anderson     5411     7              3970.</span></span></code></pre></div>
+<p>All we need to do now is push our <code>avg_dist_data</code> data back into our “Training Log” form, set <code>edit_event = TRUE</code> and the “Average Distance” field will be populated</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="dt">df         =</span> avg_dist_data,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="dt">form       =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="dt">edit_event =</span> <span class="ot">TRUE</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>)</span></code></pre></div>
+<pre><code>#&gt; Please respond to pop-up prompt</code></pre>
+<p>Running the above code will prompt a pop-up that you will have to accept, like so</p>
+<div class="figure">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAbIAAACxCAYAAAChkDgGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAB9dSURBVHhe7Z15eFTV3cf5+/3jbev2vG+1q77va7VuSAphCQIqWm1ZZQnQ8orS1rq0tX20uC8Nbm8jsoaUJSxSiYJsIZSwqwiBQMISdhCIbBJRRBqpft/zuzNn5syZe2/ujAOZG76f5/mSuXPvPefcmzvnk3PmztACAfjqq69SzpdffskwDMMwro5oLKngKzK3wiVuDbXzr3/9i2EYhmFcHWHHzTWSILiKzK0wu1K3xkrOnDnDMAzDMElxc4bE9oubg/xIEpm9s12Brthu4BdffMEwDMMwjcb2R1CheZEgMnsns0BbYLpBDQ0NCfnnP//JMAzDMEmxfWGLzU1otpfc8BSZn8B0I3TjTp8+Hcvnn3/OMAzDMEkxXWHLzU9oppvciInM3NBNYtqcbgIzG3rq1KlYPvvsM4ZhGOY8jukE0xVuQtOeSVVmSSLzkpi2phaYKS7d4JMnTzr59NNPGYZhGCYW7QdTcKbUtMy00PxkZuOITK+0RWZKzBSYtquWlzTyk08+cXLixAknH3/8McMwDMPEvKA9ocWmhaalZgrNlJktMolJgsiCSkwLTItLN7a+vh7Hjx938tFHHzEMwzBMzAviCFNu4hBTaKnIzKRRkdkS0yMwaYQWl27ssWPHcPToUSdHjhxxcvjwYYZhGOY8jPaA9oI4wpSbOEQLTbwiQjNllrbI7NGYLTE9ApNGaHFJgw8dOoQPP/wQdXV1Tg4ePOjkwIEDDMMwzHkY7QHtBXGEuEJLTvwhUtMjNRGaKTO3UZmvyLTttMjMKUU9nSiVSGUzZ85kGIZhmIxFBkYiNFNmeorRbVRm0kLbzZSYHo1JIfZoTOwplRJCCCGZQJwiIzUZoclgSaYZxTtBR2WeIjPfG9OjMbGlVESREUIIyRTilP379zsyk5GZyEwGT+Igt/fKAonMnlY0R2Myt0mREUIIyRTilN27dzvvq4lj5B4MGTyZo7K0RGaOxmSYJ4YUU4oxKTJCCCGZQpyyfft27N2717kpRFwjgyfxT1oi0++PmSIzpxWlEoqMEEJIphCnbNmyxRmVyV2O+r0yPb0oThI3pS0yKUiLTG6XlEooMkIIIZlCnFJTU4MdO3Y475WJa8Q5aYlMhm6ysdvdijJnKXOXModJkRFCCMkU4pSNGzdi27Zt2Ldvn/MWljhH3tYSF5k3fKQlMv0tHlpkYksvkdVXlaKoqCieij3RNWeR+iqUFpWiqj66TAgh5Kwi/bu8j+WFrJNtgiJOqaqqQm1tbUxkcnNhSiKTFTJk8xKZzFVKoVK4l8giEquAqa49FWdDZntQQXERQkiTIaIq/tvfXGXmt84LLbKtW7c6N3zIN4B4icycXtT4isy8Y1GL7IMPPkgWmTMqSpRYhHpUlWZaOhQZIYQ0NW7CSkdigjhl/fr1SSKT+zPOncj2VHiOvGRUVupYxxaQtezIUE9LaimKCPVzRajYI/vElyN1+pUj+0Sf19tVqbZG10XaRQghJB1McaUrMUGLTO5cbDKROdOKHiKTdY2LzFqnxOjs4yrIxsox5JXw/llkXaw8Kdt1FEkIISQoWmDpSkzICpH5jcgCicwaRTmR8qLPJ46cGisn+X26SNN89iOEEJIWzUdkLgKJYL5HlpqATPTdkI0KiSIjhJBzhpaY/DQfp0p2iEzh3KFYWqXUpYm+vxUbqUWWY4vO1J4WiUjF/z2r4FOU9tSiFpvffoQQQlLBTVzpyixrRCbokVM8ligceUXXVVQkisSRjrGv2Mjc3hhpOdLU29hCSijHT1wUGSGEpIOfsNKRWVaJLImYVCgMQghpLshAwU9Usk62CUp2i4wQQghpBIqMEEJIqKHICCGEhBqKjBBCSKihyAghhIQaiowQQkioocgIIYSEGoqMEEJIqKHICCGEhBqKjBBCSKihyAghhIQaiowQQkioocgIIYSEGoqMEEJIqKHICCGEhBqKjBBCSKihyAghhIQaiowQQkioocgIIYSEGoqMEEJIqKHICCGEhBqKjBBCSKihyAghhIQaiowQQkioocgIIYSEGoqMEEJIqKHICCGEhBqKjBBCSKihyAghhIQaiowQQkioocgIIYSEmvNSZIdVO+bNnYu/FRfjsWHD8MeHH3Yij+U5WSfbEEIIyX7OG5Gtq6zEayNGoLq62mnj8ePHsWXrNhRPLcfwV0vx3CszMHbSPGzaVOu0taGhARs3bnT2kX0JIYRkJ+eFyD7Ytw+vv/469qmf9fX1WP3+Ogwf9x5+90ot+jy2Gz0f2Ynuf9qM7g9vwF1/qMA9w+Zg2Yp3nTbLPrKvlEEIIST7aPYimz5tmlN3ZWUVSt5ch9+/9hHueuIgbn5wL259aA9ueXCnerwDnX+7FZ3u24y8X23ATb+qRKehK3Hzvf/AwAeLsbB8CY4dO4bp06dHSyWEEJItNGuRLV+2zGmP1D9h7iEMK6pHlwf2KnHtw60P7nIk1uWBbeh8/1Z0vK9GSawaHe5dj/b3VqLdkHfRYchKdPzl2+gyaLLTdilLyiSEEJI9NFuRyehJ2lI8sxqjZp1QslIjsN/tU/LapUS2E7n3bEHukE1qJLYJd/x+E257SCS2Dtfnr0LLASvRZvAK5AxahpwBi/GT/AVo338y7hj0gvPe2eTJk6O1EEIIaWqapcjkfS2ZCjxy5AhGvvUxej9+QElsD259aLcjsY731eKxojosXHMKh+qBz04DJ05+hb0fNuCtpUcw8PH1aJm/FK0GLkGr/ovQsl8Z2uTPRNu+xahTJ0jKPXjwYLS2NNlZiNwWuSjcGV0mIaAMQ7/278wsQx4PVf/azydTNrQFWrSIJPdrXzRmvW7YbWls+7Dgf44j6/V5trcz15nbNFZmNhKkzeE6rmYnMrnDUG7OeG/1WowurVPS2qkEpkZhD2xDl/trcePgjXh5uvut9XJcp0+fweenPseMst24ttccXNd7Lq7tPRs/7lGqlv+Otj1fwYw35qB4/Hhs3rw5umfq7CzMxdChQzPQKZFzRyZe3F5l+JSt/ugpjFnkXHQw4erEgtPIcZWp8xxdJ69P99emXUYYz1WQNofruJqdyEaNHIk9e/Zg1JTVGDbuWOxmji73b0Wn325By4Hr8UKJ+2hKjuvMmS/R0HDGWf7rlGolr9m4ptcsXN29FD/u/gba9B6LTr2fQk1NDcaNHetslzo7UZgrf+GqiyW3UC1pIhfP0KG5aBF7Xp6L/gU41P6bWMppgdjTZUPd9/N94dnLceTFHNnfa9RgLkceZ0PbZfQS74SsbaQep9JI/ZE6XLYvVNslrDPb5DUqMrZJOF7z+aFGe3TbgpStkXYnH3OE5PrNc+H8Pp3ndb3O09bv2a0t5vbRx0nnRxPfP7ewMKGeOJEygl0rbs8bzyWU31i55rm3j9uksXOcXGeQ85F4XJrU9w92fduY5Zjnwe11YGwbe87r9ZIdNDuRyefE5DNiD79Whw6/2mLcjbhRpQrX9X8fz03YhTNfnMa8RevR53fzced98/DKxLX4Uh3DF19E0nD6C9TXf4oru83ENT1mKpFNx9XdpuHaHhPRutcoHKyrw4L5851jTxmZVjQuyvh1F7mAzIskvt79xRXvnCKP9b4JF3uSJMxy7GWNPG+/wP32lcfZ0XazXNk/V9XtWnYMKceUtXqxGvt7izwRr+NNOp6Ec+b22IeE85GIe/362PRP/Zy93sRui7291/mRxfixOr8H12OKlGH+HvzOXayuKEnn05KWXa73ubePW3C/VuOY50Jo/Hy4HVec1PdP/fq2nk84DybmObGP08TcLjtoViKTb+OQ+pevXI0BT+xyRNbx15uQN7QaHYauR4d7K3HDAPn82CY88PRsXH5LMa7tV4Hr+y3G5XfMwoip1TitBCYjsobTkWO54o5puK7nG0pg05TQVLpPRsseYzG/bBH279+PeiXNVIlfnM6C8UK1L57oRW4ktqlGpOi8kO3Oyy4nyDoTKc94gTmkWm4Ttd15/zHyQitTf50XlrnV46w02hekDo/6HGSd2/EGLc+v7CjSXg+JRfZ3qz/a8anleAdn1pWJ33OQdSZu27m13W1/vzr81gnmsttxK0QM8R1cSKUOeex2XCZp7B/0+o7hV4csBnkdKFy3yw6alcjmqxGS1POHv5QraSl5qVGY3Ino3E5/9/vIvfsdtPnFSrQetAI5A+VmjsW4sf9C3NhvAa7qPhvtf7FAnYAjqp3H8MmJk/jw0Ee4uEMxLu00AZd2HK9+FuGyTuPwvc6j0LHbH5XIDqCsrMw57uAkX5zef/G7XExJRC/e2MUs+JWTWh2RTjBI+1IrN8LZart+Qav1sRe4OoaYOBUJUghah1d9gte6oOX5lR39PST3ggY++0c7oPjuydtm5vfst84k3e0Ev30bKze5vMTjDkIqdSTXl0w6+we4vhPwqSPo68Bzu+ygWYlswoQJqNm0FfmPvhMdga1H+yFr0W6Iktj/rlISW4HWjsCWoNWActyYX44b+szHj7rNwgXtp+HBZ8uxceNm7Ni2B59+8ineWbsD3+5UrOQ1Hpd1LsJ3nIxVIhuNll0fwYqV72LSxIlqFHc62oIAyAVhdUjxEZp9gcgF6j5VYCIvRvvGkaSphNhFGCkz1gSnk/O7KPWLRj/22je72i7lmlMuSfXIvrog3+Mwl/1ewF7Haz3vWZdP2dJBxQ7aC6/6pVzpqPVP/Zxdl+zv1RZz2W+d37Ga2GUEPHdRvK+PRsp1bY953LLoJQON3/ELPufDlfT2b/T6TsDnPMjjIK8Dz+2yg2YlMvnS35dHvo5ef1qjRmBr0Pbu1cgdHBGYMwIbsMSRl4zCLr/jLfxn57/jko5T8e9tSjDtjXKUly3CiuWrsa6yBsveqcElOU/iu13Gq4xTKcL31M/vq/zg5rG4vuszmDVvGV4YPtw5tqAkTCtqYheJfVErnGkEe+Rm4XphSVl6P2uds310XcIbvybG/maDPffNprYrotvFmm4vJxyf33EkLsvvT/Zx7TC8jtd83qcur7Klk4qUGU/Q+s1O3ykn6Tozz0OsxVZb7O3jbU5a9jxWE7sMhee14tY+4zm/tgi+514/H6/N2T5jIlN4Hpcmzf0bvb4tAp2HxN9X8jXgvl020KxEJt9g//thI9H94UolsPeUwFYhZ9BytBq0TElssZLYIlyvRmAisYs7TleZhn/PnYROv5iJhQsWYvbsMlRUrETV+hrk9fkrLswdge/fMh4/cFKkBBbJD9XjG25/Hi+NmIznnnvOOa6mxOmgfF982UuY20784e+WnCuan8j+/Ffc9tuVSmAyhbhUyUveByvHtb3n4Xu3valGYNOcXJw3GRe2m6hGYhWoWFSBuXPLnSxZ9j66DRmJK+8swY/unISrfjYJV8cyGVfdGUnOHS9i1PiZeObpp50T1zREpgySRzRhIMxtJ14kjh75uyXnhmYlsicefxwvvToBXX9djlb5FWjZfzFu6LsQLfstwLe7vBEdhU3BRR1KcHGHifi3VuOxZvV7ziisvHwZVq1cjZa3P4tL80bjmp+X4NpuJbiuewmu7zFFZaqT67qrn92mILfbcMxduArPPfus87k1QgghTUOzEpnceFG1YSO6/rIY1/crw3V9FuDKbm/hPzrPwCV5IjA1Cms/ARe1L8YFbeUOxGLUVG/G2rXV2LJ5Kx4cVowbek5XmYqc3tPRus/f0abvTJXSWFr3UbnrDdx61/OoXLcBo0eNosgIIaQJaVYikw8oHz58GL2HvBD9aqm50WlEkdgkZyrxgnbjcVG7IlzYdhz++/aJ2FhVg3XrqlFZWY0b7yxAq94zkNNnBtr2m4m2/d9Eu/xZaK/SLn822vWfrZ5Xy/1L0e+eF9RxncDECROacGqREEJIsxLZ0aNHnVvh5y0oxzXdp+HSziVRgU3At9QI7Ju5Y3FB7hi1PDryebCbxyOv32h06j8GXQYUoWX3iUpWbzri6jBgHjoOnK9S5iRvwMJo5qHzgBlYvGQVNqgTt2rVKkeemUXuENJ3KJl3MVl3NGUlXm0Pir3P2Txmv7KD1htku7N5DISQZiUyobKy0qnnqp+OwyV5xWoEVhyRWJsxSmRjlMhG4eL2o5XExuGKW4vUz4m4vGsJrv75DOT2e1MJbHZUYiKwhSqLnOQNWOyk08C5uCV/Iurq6jChqCj2lVhnD7MTDFuHmE577X3O5jH7lR203iDbnc1jIIQ0O5HJe1Y7duxATpchuKz9i/hWm9H4ZuvR+EbrEernCFzUbiQu7Tga31cia9uvBEsrlmCJStW69ZjyVjXyHHktRscBS1WWIS9/hZMO/eXnUnTNL0H/e17CnDffREFBgfPfucjxBsX8XE9SByefBXE+CGI+7/XYRtbZd4tF7gxM+KxJ7HZoY/v4Bk75+ktXC1Noa/yLWvV2RvkqieXY9Wrc9omWl/aXsgpmueb5i5adsKzL8vusjNd2+k7MSOLtt59z244Qki7NTmTyrfRy00dR8UT8sO3DuDD3VXwz5zV8I0d+FuKS9iNxWafIiGzYS/OwYEGFymJULF6OWnUSWvcuVwJboqS1HB3yV6JDv1Vo3+89lZW4qX8F7swvxJz5i/H0U0+hpKTEGY3JcQcl/qFUhZKB+xd+mh2s1+NEEgRpCMusz9xGHkeelk7VLD++TfC2GnU30l73ek3sfSLlm+0wPxjaeHmRbWLtM85NpOz4PknbBT3XrttJ2UGmWM3tCCHp0OxEJsi0n9QldxN+N/fPuKj1X/CNVq+oEdn/4dK8kfjBzWPwX12LUThhGVaufB8rVqzG6tXrsHvXLrTstkiNvlahbd/VyO39Plr3WoOf9HofnfouQte+k7Bn7z7UKlnOmDEDGzZscI43JZxP2Ec6Lu8v/DQ7Pq/HJvbzxnLsmwqShaVHBJKIDKxyUm6rYC67rXOr18SvPMEu/+uU5/VYsJc1jWzniE23x6tshet2hJB0aJYiE+R7FxsaGnBD3kAls0dxwU9exAVtXsF3Oo3CFV3H4crbJ6HvQ29hR20tqqu34IN9+7Cuqhbt1AisXd930EYJrHWPtcjpsQa5Pd/BLX1K0HvQ8zh96hSef+YZJcCVzv9EbZ6MYGgJqM4tJgUli5hwBLPj83psYj9vLkfr8/1iXo39fKptFcxlv3VeNLaPX/luBN3fbzsTn+08R3vWPp7bEULSodmKTNolspG2bN++A//T/n5c3vFJXHHLa/jRT8ehZc+pzufEbvj5FHToMwnX3DYduX2XoW2f99QobDVyuquRWLf30KnX27i1l7zvthOfq+N5+eWX8fbbbzvHktKXBRvIlJ3/F356dYLenZ739FlkXWL5IiRzOlCTXH5qbRX82utVr4lfeYK5HKQ8tUegqUWrLGfEZNar8dlOHidMger9rWPw3Y7TjISkSrMVmSDtKho3zrkhY8SoIlzf8W4lrOG47mevIadXiRLXDHQYMBft88vQccBy5PVfjrZ3vYs2vd9Fu15LcVOv+bitZwGmTHsLe7dvxwvPPotZs2ZhzZo1OKVGZlJ+WjidlzENZi8ndHxej21kncdUVUJnGcWZNtTb687TpfyU2iokLotEZPtYx+9abyKJ+/iXH6S8yD56m4Bl+d3s4bmdUY+1f/Ixee1PkRGSKs1aZIK0abuS0NgxY1BbW4tNmzZj5OjxyLvjAdzU4yncml+E2weVqMxA1/ypuLnna7ilx3MonjBNnZRaVL37Ll5VAhtfVIQFCxY4/5nmyZMno6UTQghpapq9yARp27KlS/HSiy/iH+XlOKXadejQYdQdOoaSGQvw4qvT8NKrMzBp6gJs274X+z7Yj1NKVv9Qo68nHnsMhYWFWKr237Rpk3NMUh4hhJDs4LwQmSDtlLZJG9auXYsxo0djeEEB/vzoo8635ksefeQRPPXkkxg+fDgmT56MOXPmOB+wls+lyShM9ieEEJJdnDci00jbpE1ysJs3b3a+YqqiogLz5s3D3LlzsXDhQmdZBCbrjxw54mwvx0gIIST7OO9EptHt1m2VEZdEbuKQZTkWyosQQrKf81ZkhBBCmgcUGSGEkFBDkRFCCAk1FBkhhJBQQ5ERQggJNRQZIYSQUEOREUIICTUUGSGEkFBDkRFCCAk1FBkhhJBQQ5ERQggJNRQZIYSQUEOREUIICTUUGSGEkFBDkRFCCAk1FBkhhJBQQ5ERQggJNRQZIYSQUEOREUIICTUUGSGEkFBDkRFCCAk1FBkhhJBQQ5ERQggJNU0mshMnTjAMwzDM1w5FxjAMw4Q6FBnDMAwT6lBkDMMwTKhDkTEMwzChDkXGMAzDhDoUGcMwDBPqUGQMwzBMqEORMQzDMKEORcYwDMOEOhQZE/qQYPzmN79xPX9mSDCCnEsJCUbQ8+kViowJfYQDBw4wPpk8eXJgkbntz8QT9FxKeD4bTyrn0ysUGRP6CPKCcFvHRJKqyNzWMZGkIzK3dUwkFBnDqAjsLPxDkWUuFFlmQ5ExjIrAzsI/FFnmQpFlNhQZw6gI7Cz8Q5FlLhRZZkORMYyKwM7CPxRZ5kKRZTYUGcOoCOe6sygd3AKDS6PLVQXIySlAlbVNNiX7RVaKwS1aoMXgUuu5HBRUmds1fbJCZKWD0ULOVzQ5BVXu22U0Z+f3QZExjIpwzjtf6UiinW5VQc456kjSTzhEps5jjtlRUmSucSQ2GKVu685qKDKKjDlrEc5956tf1FUoiHW+8lz0r2RjZCGii/zl3BSdTyRhEVlBqTm6tTtO4/w2oeCaVmTm9ea2Tp8fc5QWPY8F8VFc4h9ebtet13OZP+8UGcOoCE3R+TojscGDVSIv9Ph0oy23phOYTmhEps5Z/DwmdpzyfKwDllFJE03nNqnIAk9jm9edPDaEZI3o5Lyaf3jp59yvZYqMImPOSoQm6XylU1EdRLzTjf4FG028I0juKM51wiQy57HTWVvPJXSi9vK5S1aLLOG9syDnzu08ynPx6zh+LZ+dc06RMYyKkBWdr8+LPDK9yKlF7ySev8j7jgU+5/fsdKpB0qQi8zvuhFGquZ3fuXMrz6sOr+e/XigyhlERmr7zjYy8vG/6MKdozn3CJjK9bN78wanFSJw/ihKOvRQFcl7knCRMH+pz535uI8tu163XtWyXk5lQZAyjImRF5xudaoxMx1jvT0iacHoxfCJTSeiM9Tb6/Ga+Qw2aphaZJH4DkcTtWhtsnE/73Lot6/2i16jntZz5806RMYyK0DSdb3iS/SILT7JBZM0pFBnDqAjnurOI/zUcids22ZRsF5l9Pu247dNUocgyG4qMYVQEdhb+yXaRhSkUWWZDkTGMisDOwj8UWeZCkWU2FBnDqAjsLPxDkWUuFFlmQ5ExjIrAzsI/FFnmQpFlNhQZw6gI8mJg/BNUZG77MolJRWRu+zOJociY8z7yImCCxe38mXHbh3GP2/mz47Yf4x638xc0WmRbt27NvMhOnTqVJLL9+/dTZAzDMEzGIk6pqqpKEpn4J7DItMy8RCYVHT9+HIcPH6bIGIZhmIxGi6y2thb79u1zBk1eItMSS0lkJ0+edCrSIpM3PikyhmEYJlMRp2zYsCFBZOKctEQmQzbZuKGhAadPn3YKEJHJPGV9fT2OHDmCgwcPUmQMwzBMxiJO2bhxI7Zt2+bchyGDJhGZ+EdcJE4SN5nTiimJTG740CI7evQo6urqKDKGYRgmYxGnVFdXY/v27TGRiXPSFpkM3WyR6Rs+jh075rwJR5ExDMMwmYo4paamBjt27HDuw5DZP1tk4qaURSZzklKA+T6ZvnORImMYhmEyFS2ynTt3OvdhyOyfDJ5kIJW2yGQIp0VmTi/qGz4oMoZhGCZTEads2rQJu3btcu7DkNk/eV4GUuaNHimLTI/KRGT6Nnx9wwdFxjAMw2Qq4hT5Vo/du3c792GIyGTwFFhk8o8WmSkzr+lFqUAqZRiGYZhMRW70cLv13p5W1CIziYlMy8welZnTi1pk+oPRMp8pn8SWuU35DMC6deuwdu1aJ2vWrGEYhmGYmBcqKysdT8jXUckHoOWWe5lSlM+PiU/MOxZFZEHeHxOSRGbLzB6V6dvw5e5FsafMacq9/zIslAaJ1CRyK6VEGsowDMOcf9Ee0F6QiCc2b97sOEMGQjISE4+IxMQr+v0xGTzpaUV7NJayyOwpRv2ZMqlM5jJlZCbfjSUNEaPK7ZMSaRzDMAzDaC+IIyTiC3k/bM+ePc6ASO5UFInpuxUbm1b0FVljMjPvYNQyk5s/pAFyp4k0RsQmEbsyDMMwjPaCOEIivpCBkLhDphJFYPLxLj2laN7k4SYxiYkjMsFNZH4yk8pk+CcVSwNEatIYiciNYRiGYXS0H8QVOlpeMgqTAZK8feV1p6IpMpskkfnJTGJOM5pC05EG6UgDGYZhmPM3phNMV4i4JOIQLTBxS2MSk9jERCaYG7rJTCIjM/N9MxmhSQN0RG4MwzAMY8d0hbhDIh7RAhO3aIlJgkhM8BSZRBfiJjSpTEtNi41hGIZhGovpDome8RO3mKMwie0lNxJEJtg7mQVKbKGZYmMYhmGYxmL7Q3vF9o3tIy+SRCbYO0vsCnTFduwGMgzDMIzEzRkS2y9uDvLDVWQat8IkdqVucWsswzAMc/7FzRF23FwjCYKvyDRuhTcWt4YyDMMw51/cHNFYUiGQyNxwq5hhGIZhUs3XJW2REUIIIdkARUYIISTUUGSEEEJCDUVGCCEk1FBkhBBCQgzw/3BzAyeBErjfAAAAAElFTkSuQmCC" alt="edit_event confirmation" width="500px" />
+<p class="caption">
+edit_event confirmation
+</p>
+</div>
+<pre><code>#&gt; Uploading 2 existing records in Training Log...
+#&gt; |===================================================================| 100%
+#&gt; Authentication success: (200) ok
+#&gt; SUCCESSFULLY_IMPORTED: 2 out of 2 records successfully imported by user 12345</code></pre>
+<p>Success! Our two records’ “Average Distance” field should now be populated.</p>
+<p>A few notes on <code>edit_event</code>:</p>
+<ul>
+<li>The data provided to <code>push_smartabase()</code> must have a column called <code>event_id</code> in order for editing an existing record to work. You can retrieve the event IDs by pulling the data first with <code>pull_smartabase()</code>.
+<ul>
+<li>If there are any rows in your dataframe that do not have an <code>event_id</code> (i.e. <code>event_id = NA</code>), then those rows will be uploaded as new records on Smartabase in a seperate API call.</li>
+</ul></li>
+<li>Editing an existing record actually overwrites the data on Smartabase – hence the need for the confirmation pop-up. <strong>If you miss any fields in your dataframe that do exist in the Smartabase form, those values will be deleted on Smartabase</strong></li>
+</ul>
+<p>It is recommended that when you initially pull the data, make sure you only edit the fields of interest. Leave any other fields as is.</p>
+</div>
+<div id="match_id_to_column" class="section level3">
+<h3>get_id / match_id_to_column</h3>
+<p>Whenever you push data to Smartabase using <code>push_smartabase()</code>, the API requires that there exists a column called <code>user_id</code> in the dataframe which contains each athlete’s Smartabase user ID.</p>
+<p>Sometimes you may not have all of your athlete’s user IDs on hand, but there are several ways to find them.</p>
+<ol style="list-style-type: decimal">
+<li>Pull some data from Smartabase for the relevant athletes – you will see that there is a column called <code>user_id</code> in the resulting dataframe</li>
+<li>Use the <code>get_id()</code> function – see the <code>helper-functions-guide</code> vignette for further explanation</li>
+<li>Use the <code>get_id</code> and <code>match_id_to_column</code> arguments in <code>push_smartabase()</code> itself</li>
+</ol>
+<p>This section will explore the latter option.</p>
+<p>Imagine that you want to push some Training Log data about two athletes, Aiden Thomas and Jamie Anderson, but unfortunately you do not know their user IDs. This is the dataframe you want to push to Smartabase</p>
+<pre><code>#&gt; # A tibble: 2 x 4
+#&gt;   start_date about          distance   RPE
+#&gt;   &lt;chr&gt;      &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 15/04/2019 Aiden Thomas       2530     5
+#&gt; 2 15/04/2019 Jamie Anderson     5411     7</code></pre>
+<p>In this case, when calling <code>push_smartabase()</code>, all you would have to do is set <code>get_id = TRUE</code> and <code>match_id_to_column = &#39;about&#39;</code>. This tells <code>push_smartabase()</code> to look on Smartabase for the user IDs of athletes named “Aiden Thomas” and “Jamie Anderson”, and then supply those user IDs to the API call.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb8-2"><a href="#cb8-2"></a>  <span class="dt">df                 =</span> training_data,</span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="dt">form               =</span> <span class="st">&quot;Training Log&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="dt">get_id             =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb8-5"><a href="#cb8-5"></a>  <span class="dt">match_id_to_column =</span> <span class="st">&quot;about&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>)</span></code></pre></div>
+<p><code>match_id_to_column</code> will accept “about”, “username” or “email”.</p>
+<p><strong>You must ensure that a column called “about”, “username” or “email” exists in the dataframe when setting <code>match_id_to_column</code> to one of these values</strong>.</p>
+<p>If the dataframe you are uploading to Smartabase already contains the user IDs, then you do not have to do anything. Make sure <code>get_id = FALSE</code>.</p>
+</div>
+<div id="table_fields" class="section level3">
+<h3>table_fields</h3>
+<p>Smartabase tables are used when you want to store multiple rows of data in one record. For example, they are prevalent in strength testing forms where an athlete is performing multiple exercises in the same session; e.g.</p>
+<div class="figure">
+<img src="data:image/png;base64,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" alt="edit_event confirmation" width="500px" />
+<p class="caption">
+edit_event confirmation
+</p>
+</div>
+<p>However, dealing with Smartabase tables in R is a bit tricky. For instance, here is the structure of the data when we pull from a form that has both table and non-table fields present</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>strength_data &lt;-<span class="st"> </span><span class="kw">pull_smartabase</span>(</span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="dt">form              =</span> <span class="st">&quot;Strength Testing&quot;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="dt">start_date        =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="dt">end_date          =</span> <span class="st">&quot;15/04/2019&quot;</span>,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="dt">filter_user_key   =</span> <span class="st">&quot;about&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>  <span class="dt">filter_user_value =</span> <span class="kw">c</span>(<span class="st">&quot;Aiden Thomas&quot;</span>, <span class="st">&quot;Jamie Anderson&quot;</span>)</span>
+<span id="cb9-7"><a href="#cb9-7"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>strength_data</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt; # A tibble: 6 x 8</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;   start_date user_id about       session_rpe exercise   load repetition event_id</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt; 1 15/04/2019   37204 Aiden Thom~           7 Bench Pr~   120          3  2381840</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt; 2 15/04/2019   37204 Aiden Thom~          NA Bench Pr~   115          3  2381840</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; 3 15/04/2019   37204 Aiden Thom~          NA Bench Pr~   110          3  2381840</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt; 4 15/04/2019   37201 Jamie Ande~           8 Back Squ~   170          3  2382033</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt; 5 15/04/2019   37201 Jamie Ande~          NA Back Squ~   165          3  2382033</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt; 6 15/04/2019   37201 Jamie Ande~          NA Back Squ~   165          3  2382033</span></span></code></pre></div>
+<p>Here “exercise”, “load” and “repetition” are all table fields, whereas “session_rpe” is not – it was only recorded once in the session. “start_date”, “user_id”, “about” and “event_id” are metadata that will always populate each row. You will notice that for each unique start_date and user_id pairing, the non-table field (“session_rpe”) will only populate the first row.</p>
+<p>If you are pushing data to a Smartabase form that has both table and non-table fields, your data must have this structure. Further, using the <code>table_fields</code> argument, you will need to tell <code>push_smartabase()</code> which columns in your dataframe are table fields.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="dt">df           =</span> strength_data,</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="dt">form         =</span> <span class="st">&quot;Strength Testing&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4"></a>  <span class="dt">table_fields =</span> <span class="kw">c</span>(<span class="st">&quot;exercise&quot;</span>, <span class="st">&quot;load&quot;</span>, <span class="st">&quot;repetition&quot;</span>)</span>
+<span id="cb11-5"><a href="#cb11-5"></a>)</span></code></pre></div>
+<p>Sometimes there may be a lot of table fields – especially in GPS forms – and it can be annoying to have to manually supply all those names to the <code>table_fields</code> argument. But since table fields tend to be next to each other in a Smartabase form, our recommendation is to extract the names of the relevant columns by column number; e.g.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co"># Imagine we have GPS data where column 10 through to 60 are table fields</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>gps_table_names &lt;-<span class="st"> </span>gps_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="dv">10</span><span class="op">:</span><span class="dv">60</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">names</span>()</span></code></pre></div>
+<p>We could then supply the vector of table field names to <code>table_fields</code> in <code>push_smartabase()</code>; e.g.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="dt">df           =</span> gps_data,</span>
+<span id="cb13-3"><a href="#cb13-3"></a>  <span class="dt">form         =</span> <span class="st">&quot;GPS&quot;</span>,</span>
+<span id="cb13-4"><a href="#cb13-4"></a>  <span class="dt">table_fields =</span> gps_table_names</span>
+<span id="cb13-5"><a href="#cb13-5"></a>)</span></code></pre></div>
+<div id="duplicate-user_idstart_date-when-table_fields-null" class="section level4">
+<h4>Duplicate user_id/start_date when <code>table_fields = NULL</code></h4>
+<p>If <code>table_fields = NULL</code> but duplicate user_id/start_date pairings are detected, the dataset will be split into separate datasets that represent those records which are the first user_id/start_date pair, and those records which are 2nd, 3rd, 4th, nth user_id/start_date pair, and each dataset will then be pushed separately.</p>
+<p>For example, let’s say we have the following dataset</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">print</span>(strength_data)</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#&gt; # A tibble: 6 x 5</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt;   start_date user_id about          exercise     load</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;       &lt;dbl&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt; 1 15/04/2019   37201 Jamie Anderson Back Squat    170</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt; 2 15/04/2019   37201 Jamie Anderson Back Squat    165</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; 3 15/04/2019   37201 Jamie Anderson Back Squat    165</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#&gt; 4 15/04/2019   37204 Aiden Thomas   Bench Press   120</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt; 5 15/04/2019   37204 Aiden Thomas   Bench Press   115</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a><span class="co">#&gt; 6 16/04/2019   37204 Aiden Thomas   Bench Press   110</span></span></code></pre></div>
+<p>As you can see, Aiden Thomas has two records occurring on “15/04/2019” while Jamie Anderson has three records occurring on the “15/04/2019”. If we try to push this data while <code>table_fields</code> is left empty, <code>push_smartabase()</code> will internally split the data like this</p>
+<pre><code>#&gt; $`1`
+#&gt; # A tibble: 3 x 5
+#&gt;   start_date user_id about          exercise     load
+#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;       &lt;dbl&gt;
+#&gt; 1 15/04/2019   37201 Jamie Anderson Back Squat    170
+#&gt; 2 15/04/2019   37204 Aiden Thomas   Bench Press   120
+#&gt; 3 16/04/2019   37204 Aiden Thomas   Bench Press   110
+#&gt; 
+#&gt; $`2`
+#&gt; # A tibble: 2 x 5
+#&gt;   start_date user_id about          exercise     load
+#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;       &lt;dbl&gt;
+#&gt; 1 15/04/2019   37201 Jamie Anderson Back Squat    165
+#&gt; 2 15/04/2019   37204 Aiden Thomas   Bench Press   115
+#&gt; 
+#&gt; $`3`
+#&gt; # A tibble: 1 x 5
+#&gt;   start_date user_id about          exercise    load
+#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;dbl&gt;
+#&gt; 1 15/04/2019   37201 Jamie Anderson Back Squat   165</code></pre>
+<p>The first dataset contains the records that represent the first occurrence of a particular user_id/start_date pairing, the second dataset contains the second occurrence of a particular user_id/start_date pairing, the third dataset contains the third occurrence of a particular user_id/start_date pairing, and so on.</p>
+<p>From a user’s perspective, what you would see is something like this:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="dt">df   =</span> strength_data,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>  <span class="dt">form =</span> <span class="st">&quot;Strength Testing&quot;</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>)</span></code></pre></div>
+<pre><code>#&gt; Uploading 3 new records to Strength Testing...
+#&gt; |===================================================================| 100%
+#&gt; Authentication success: (200) ok
+#&gt; SUCCESSFULLY_IMPORTED: 3 out of 3 records successfully imported by user 12345</code></pre>
+<pre><code>#&gt; Uploading 2 new records to Strength Testing...
+#&gt; |===================================================================| 100%
+#&gt; Authentication success: (200) ok
+#&gt; SUCCESSFULLY_IMPORTED: 2 out of 2 records successfully imported by user 12345</code></pre>
+<pre><code>#&gt; Uploading 1 new records to Strength Testing...
+#&gt; |===================================================================| 100%
+#&gt; Authentication success: (200) ok
+#&gt; SUCCESSFULLY_IMPORTED: 1 out of 1 records successfully imported by user 12345</code></pre>
+</div>
+</div>
+<div id="current_date_format" class="section level3">
+<h3>current_date_format</h3>
+<p>If there is a date column in your data (e.g. “date”, “start_date” or “end_date”), it must be in dd/mm/yyyy format (i.e. dmy format). If, say, your date column is actually in mdy format, then rather than having to convert to dmy yourself, you can simply supply <code>current_date_format = &quot;mdy&quot;</code> in <code>push_smartabase()</code> and the relevant date columns will automatically convert to dmy format; e.g.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>example_mdy_data</span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="co">#&gt; # A tibble: 1 x 3</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt;   date       user_id example_field</span></span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;        </span></span>
+<span id="cb20-5"><a href="#cb20-5"></a><span class="co">#&gt; 1 01/31/2019   37204 test data</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="dt">df                  =</span> example_mdy_data,</span>
+<span id="cb21-3"><a href="#cb21-3"></a>  <span class="dt">form                =</span> <span class="st">&quot;Example form&quot;</span>,</span>
+<span id="cb21-4"><a href="#cb21-4"></a>  <span class="dt">current_date_format =</span> <span class="st">&quot;mdy&quot;</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>)</span></code></pre></div>
+<p><code>current_date_format</code> will accept the following values: <strong>“mdy”, “ymd”, “ydm”, “myd” or “dym”</strong>.</p>
+<p>If the format you choose does not match the format of the dates in your data, the conversion will fail.</p>
+<p>Likewise, the conversion will fail if multiple date formats are detected in the data (including if there are missing values), so you must ensure that the date format is uniform across the data.</p>
+<p>If the conversion fails, you can inspect which rows failed via the “log_file.txt” that will appear in your working directory.</p>
+</div>
+<div id="end_time" class="section level3">
+<h3>start_date / end_date / start_time / end_time</h3>
+<p>When uploading data to Smartabase, the API requires metadata about when the event started and stopped. <code>push_smartabase()</code> has several arguments to delineate the start and end of an event by virtue of the <code>start_date</code>, <code>end_date</code>, <code>start_time</code> and <code>end_time</code> arguments.</p>
+<p>By default, you don’t have to supply any values to these arguments.</p>
+<p>If <code>start_time</code> and <code>end_time</code> are <code>NULL</code> (i.e. not supplied), <code>push_smartabase()</code> will first search for any columns in the data named “start_time” and “end_time”. If they exist, the data found in those columns will be used for <code>start_time</code> and <code>end_time</code>. If those columns do not exist, <code>start_time</code> and <code>end_time</code> will be set to the current time and one hour after the current time, respectively. <strong>Note: start and end time must be in h:mm AM or h:mm PM format.</strong></p>
+<p>Likewise, if <code>start_date</code> and <code>end_date</code> are <code>NULL</code>, <code>push_smartabase()</code> will first seach for any columns named “date”, “start_date” or “end_date”. If they exist, the data found in those columns will be used for <code>start_date</code> and <code>end_date</code>. If those columns do not exist, both <code>start_date</code> and <code>end_date</code> will be set to the current date (unless the difference between <code>start_time</code> and <code>end_time</code> spans midnight, in which case the <code>end_date</code> will be set to the current date plus one day).</p>
+<p>Alternatively, you may have some existing date / time columns in your dataframe which are not named <code>start_date</code>, <code>end_date</code>, <code>start_time</code> and/or <code>end_time</code>. You could rename the columns, or instead supply the column names to <code>start_date</code>, <code>start_time</code> etc. in the <code>push_smartabase()</code> call.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>example_data</span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="co">#&gt; # A tibble: 1 x 6</span></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="co">#&gt;   user_id example_field date1      date2      time1    time2   </span></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="co">#&gt;     &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;   </span></span>
+<span id="cb22-5"><a href="#cb22-5"></a><span class="co">#&gt; 1   37204 test data     14/03/2019 14/03/2019 09:00 AM 09:30 AM</span></span></code></pre></div>
+<p>Note our <code>start_date</code>, <code>end_date</code>, <code>start_time</code> and <code>end_time</code> columns are actually called “date1”, “date2”, “time1” and “time2”, respectively. Here’s how the <code>push_smartabase()</code> call would look.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb23-2"><a href="#cb23-2"></a>  <span class="dt">df         =</span> example_data,</span>
+<span id="cb23-3"><a href="#cb23-3"></a>  <span class="dt">form       =</span> <span class="st">&quot;Example form&quot;</span>,</span>
+<span id="cb23-4"><a href="#cb23-4"></a>  <span class="dt">start_date =</span> <span class="st">&quot;date1&quot;</span>,</span>
+<span id="cb23-5"><a href="#cb23-5"></a>  <span class="dt">end_date   =</span> <span class="st">&quot;date2&quot;</span>,</span>
+<span id="cb23-6"><a href="#cb23-6"></a>  <span class="dt">start_time =</span> <span class="st">&quot;time1&quot;</span>,</span>
+<span id="cb23-7"><a href="#cb23-7"></a>  <span class="dt">end_time   =</span> <span class="st">&quot;time2&quot;</span></span>
+<span id="cb23-8"><a href="#cb23-8"></a>)</span></code></pre></div>
+<p>Note that if any of the start/end date/time columns you provide are of the wrong format (i.e. they are not dd/mm/yyyy dates or h:mm AM or h:mm PM times), then an error will occurr. You can inspect which rows failed via the “log_file.txt” that will appear in your working directory.</p>
+</div>
+<div id="type" class="section level3">
+<h3>type</h3>
+<p>Similar to how you can download profile form data by setting <code>type = &quot;profile</code> within <code>pull_smartabase()</code>, you can upload profile data by setting <code>type = &quot;profile</code> within <code>push_smartabase()</code>. Let’s say we want to upload some profile data to the “Athlete Profile” form for Aiden Thomas</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>profile_data</span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="co">#&gt; # A tibble: 1 x 5</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="co">#&gt;   user_id about        gender Height Weight</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="co">#&gt;     &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="co">#&gt; 1   37204 Aiden Thomas Male      184     81</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">push_smartabase</span>(</span>
+<span id="cb25-2"><a href="#cb25-2"></a>  <span class="dt">df   =</span> profile_data,</span>
+<span id="cb25-3"><a href="#cb25-3"></a>  <span class="dt">form =</span> <span class="st">&quot;Athlete Profile&quot;</span>,</span>
+<span id="cb25-4"><a href="#cb25-4"></a>  <span class="dt">type =</span> <span class="st">&quot;profile&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a>)</span></code></pre></div>
+<p><strong>Note: profile forms only contain one record per athlete. If an athlete already has data against them in a profile form, be wary that pushing more profile data for that athlete will overwrite the existing profile data.</strong></p>
+<p>You will notice that if you try to push multiple rows of profile data in one <code>push_smartabase()</code> call, each row is uploaded separately (i.e. you will get separate status messages for each row). This is because the Smartabase API only allows one profile record to be uploaded at one time. This is not something you have to worry about – i.e. if <code>push_smartabase()</code> detects there are multiple rows in your dataframe while <code>type = &quot;profile&quot;</code>, your dataframe will be automatically split by row and the API will be called to upload each row separately.</p>
+</div>
+<div id="cloud_mode" class="section level3">
+<h3>cloud_mode</h3>
+<p><code>push_smartabase()</code> accepts an input called <code>cloud_mode</code>. If <code>cloud_mode = TRUE</code>, no progress bar will be printed to screen and no confirmation pop-up will appear when <code>edit_event = TRUE</code>. This is for when the package is being run on cloud instances in an automated fashion. Furthermore, any error logs are printed rather than saved to a text file.</p>
+</div>
+<div id="shiny_progress_code" class="section level3">
+<h3>shiny_progress_code</h3>
+<p>You will notice that when you push data with push_smartabase(), a progress bar will appear in the console that roughly displays the percentage of data left to upload.</p>
+<p>It would be useful if this progress bar can be passed to shiny apps that utilise push_smartabase(), given the typical way to show progress bars in shiny is to essentially fake it; that is, to step the progress bar according to some arbitrary function that doesn’t actually represent the state of the upload – see <a href="https://shiny.rstudio.com/articles/progress.html">here</a>.</p>
+<p>The problem is that the progress bar in push_smartabase() is printed to screen, but to work with a shiny app it needs to accept the shiny app’s session ID. Thankfully, there is a package called <code>shinyhttr</code> that achieves this: <a href="https://github.com/curso-r/shinyhttr">shinyhttr github</a>.</p>
+<p>To pass the progress bar to a shinyapp, you firstly must install <code>shinyhttr</code> and <code>shinyWidgets</code> and load them in your app. Second, you must pass the bare <code>shinyhttr</code> code for producing a shiny progress bar to the <code>shiny_progress_code</code> argument in <code>push_smartabase()</code>. Let’s say you also have a button called <code>push_data</code> in your app, where clicking on that button triggers <code>push_smartabase()</code>. Your reactive function for pushing data in a shiny app might then look like this:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>output_data &lt;-<span class="st"> </span><span class="kw">eventReactive</span>(input<span class="op">$</span>push_data, {</span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="kw">push_smartabase</span>(</span>
+<span id="cb26-3"><a href="#cb26-3"></a>    <span class="dt">df =</span> <span class="st">&quot;example_data&quot;</span>,</span>
+<span id="cb26-4"><a href="#cb26-4"></a>    <span class="dt">form =</span> <span class="st">&quot;Example form&quot;</span>,</span>
+<span id="cb26-5"><a href="#cb26-5"></a>    <span class="dt">shiny_progress_code =</span> shinyhttr<span class="op">::</span><span class="kw">progress</span>(session, <span class="dt">id =</span> <span class="st">&quot;push_data_progress&quot;</span>)</span>
+<span id="cb26-6"><a href="#cb26-6"></a>  )</span>
+<span id="cb26-7"><a href="#cb26-7"></a>})</span></code></pre></div>
+<p>The key features being that you must use <code>shinyhttr::progress()</code> rather than just <code>progress()</code>, you must pass your shiny app’s session ID (by default it is just called <code>session</code>), and you must give your shinyhttr progress bar an id (in this case, <code>push_data_progress</code>).</p>
+<p>Next step is to add the progress bar to your UI, which might look like this:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>shinyWidgets<span class="op">::</span><span class="kw">progressBar</span>(</span>
+<span id="cb27-2"><a href="#cb27-2"></a>  <span class="dt">id =</span> <span class="st">&quot;push_data_progress&quot;</span>,</span>
+<span id="cb27-3"><a href="#cb27-3"></a>  <span class="dt">value =</span> <span class="dv">0</span>,</span>
+<span id="cb27-4"><a href="#cb27-4"></a>  <span class="dt">title =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb27-5"><a href="#cb27-5"></a>  <span class="dt">display_pct =</span> <span class="ot">TRUE</span></span>
+<span id="cb27-6"><a href="#cb27-6"></a>)</span></code></pre></div>
+<p>Note how the id in the UI code matches the id in the <code>eventReactive()</code>.</p>
+<p>Final note, the <code>shiny_progress_code</code> argument will still produce a progress bar in a shiny app even if <code>cloud_mode = TRUE</code>; i.e., only the regular <code>httr::progress()</code> that prints to the console will be suppressed when <code>cloud_mode = TRUE</code>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
