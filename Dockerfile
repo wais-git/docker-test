@@ -28,10 +28,14 @@ RUN ACCEPT_EULA=Y apt-get install msodbcsql17 -y
 RUN apt-get install -y unixodbc-dev freetds-dev locales
 RUN locale-gen en_US.UTF-8
 
-# RUN R -e "install.packages('odbc', repos = c(CRAN = 'https://cloud.r-project.org'))"
+# Install neon
+ARG neon_tar="neon/neon_0.1.20.zip"
+COPY ${neon_tar} neon_package.zip
+RUN R -e "install.packages('neon_package.zip', repos = NULL, type = 'win.binary')"
 
-# Repo key (currently a public repo, want to clone a private repo)
-# RUN git clone https://github.com/wais-git/docker-test.git
+#RUN install2.r --error \
+#   neon_package.tar.gz
+
 
 
 # Install renv (package management)
@@ -41,6 +45,10 @@ RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
 # Install WAISR
 RUN R -e "remotes::install_github('wais-git/WAISR', auth_token = 'ba908c52f40a15fb894b0d78efad15d6cf71f202')"
+
+# Restore packages
+# COPY renv.lock /renv.lock 
+# RUN R -e 'renv::restore()'
 
 #RUN mkdir /Local-Packages
 #COPY /renv/local/neon_0.1.20.zip /Local-Packages/neon_0.1.20.zip
@@ -56,9 +64,6 @@ RUN R -e "remotes::install_github('wais-git/WAISR', auth_token = 'ba908c52f40a15
 #COPY neon_0.1.20.zip /neon_0.1.20.zip
 #RUN R -e "install.packages('/neon_0.1.20.zip', repos = NULL)"
 
-# 
-COPY renv.lock /renv.lock 
-RUN R -e 'renv::restore()'
 
 #RUN R -e 'renv::restore(project = "docker-test")'
 
