@@ -1,20 +1,21 @@
 # Call version of r you want from rstudio repo (builds on rstudio base image)
-FROM rstudio/r-base:4.0.3-bionic
+FROM rocker/tidyverse:4.0.3
+# FROM rocker/r-ver:4.0.3
 
-# Install git
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-	git
+RUN apt-get update
+
+RUN apt-get install -y \
+    git
 
 # System dependices for R packages
 RUN apt-get install -y \
     make \
+    curl \
     libcurl4-openssl-dev \
     libssl-dev \
     pandoc \
     libxml2-dev \
     unixodbc \
-    unixodbc-dev \
     libsodium-dev \
     tzdata
 
@@ -25,18 +26,12 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update
 RUN ACCEPT_EULA=Y apt-get install msodbcsql17 -y
-RUN apt-get install -y unixodbc-dev freetds-dev locales
-RUN locale-gen en_US.UTF-8
 
-# Install neon
-ARG neon_tar="neon/neon_0.1.20.zip"
-COPY ${neon_tar} neon_package.zip
-RUN R -e "install.packages('neon_package.zip', repos = NULL, type = 'win.binary')"
-
-#RUN install2.r --error \
-#   neon_package.tar.gz
-
-
+# Set directories
+# Make directory for exports
+RUN mkdir /Scripts
+RUN mkdir /Data
+RUN mkdir /neon
 
 # Install renv (package management)
 ENV RENV_VERSION 0.13.2
@@ -44,52 +39,25 @@ RUN R -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
 # Install WAISR
-RUN R -e "remotes::install_github('wais-git/WAISR', auth_token = 'ba908c52f40a15fb894b0d78efad15d6cf71f202')"
-
-# Restore packages
-# COPY renv.lock /renv.lock 
-# RUN R -e 'renv::restore()'
-
-#RUN mkdir /Local-Packages
-#COPY /renv/local/neon_0.1.20.zip /Local-Packages/neon_0.1.20.zip
-#RUN R -e "install.packages('/Local-Packages/neon_0.1.20.zip', repos = NULL, type = 'win.binary')"
-
-#RUN R -e "Sys.setenv(RENV_PATHS_LOCAL = '/Local-Packages')"
-
-# Copy renv folder
-#RUN mkdir -p /renv/local
-# COPY /renv/local/neon_0.1.20.zip /renv/local/neon_0.1.20.zip
+RUN R -e "remotes::install_github('wais-git/WAISR', auth_token = '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')"
 
 # Install neon
-#COPY neon_0.1.20.zip /neon_0.1.20.zip
-#RUN R -e "install.packages('/neon_0.1.20.zip', repos = NULL)"
+## Copy neon
+ARG neon_tar="neon/neon_0.1.20.tar.gz"
+COPY ${neon_tar} neon/neon_0.1.20.tar.gz
 
+## Execute neon install & dependencies
+COPY "/Scripts/install_neon.R" "/Scripts/install_neon.R"
+RUN R -e "source('/Scripts/install_neon.R')"
 
-#RUN R -e 'renv::restore(project = "docker-test")'
-
-# Set directories
-# Make directory for exports
-RUN mkdir /Scripts
-RUN mkdir /Data
+# Restore system library
+COPY renv.lock /renv.lock 
+RUN R -e 'renv::restore()'
 
 # Copy script into container "COPY localfile pathinthecontainer"
 COPY /Scripts/test_script.R /Scripts/test_script.R
 
 # Execute script
-#RUN R -e "source('/Scripts/test_script.R')"
 CMD Rscript /Scripts/test_script.R
-
-#RUN R -e "getwd()"
-
-#CMD Rscript /Scripts/test_script.R
-
-#CMD R -e "source('/Scripts/test_script.R')"
-
-#CMD  Rscript /Scripts/test_script.R \
-# && mv /Data /Data
-
-# Within test_script.R there is a need to access the web, access azure or athena databases, access private credentials etc.
-
-
 
 
