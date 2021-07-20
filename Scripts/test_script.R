@@ -8,7 +8,7 @@
 # Read from sharepoint (need to work through how to do this without syncing it)
 # AMS (dont think will be an issue)
 # install git, git desktop, odbc drivers (relative)
-
+# renv::clean()
 #renv::snapshot()
 #renv::install("odbc")
 #renv:::renv_paths_cache()
@@ -48,23 +48,6 @@ mtcars %<>%
 
 dbWriteTable(wais_db_con, "mtcars_docker_test", mtcars, overwrite = TRUE)
 
-
-#                   
-# 
-# 
-# library(keyring)
-# 
-# key_list()
-# key_get("JFG WAIS Cred")
-# key_set("JFG WAIS Cred", "jfahey-gilmour@wais.org.au")
-# 
-# ?dbConnect
-
-# 
-# mtcars$last_update <- as.character(Sys.time())
-# 
-# dbWriteTable(wais_db_con, "mtcars", mtcars, overwrite = TRUE)
-
 # WAISR ========================================================================
 
 library("WAISR")
@@ -78,8 +61,6 @@ pv_comp_report_pull <-
                 form = "WAIS PV Biomech Training and Competition Report Data Collection",
                 start_date = format(Sys.Date() - 100, "%d%m%Y"),
                 finish_date = format(Sys.Date(),"%d%m%Y"),
-                # username = "wais.datascience",
-                # password = ams_pwd,
                 username = Sys.getenv("ams_username"),
                 password = Sys.getenv("ams_pwd"),
                 read_type = "read_csv",
@@ -94,8 +75,6 @@ pv_comp_report_pull <-
                         form = "WAIS PV Biomech Training and Competition Report Data Collection",
                         start_date = "01/01/1900",
                         end_date = format(Sys.Date(),"%d/%m/%Y"),
-                        # username = "wais.datascience",
-                        # password = ams_pwd
                         username = Sys.getenv("ams_username"),
                         password = Sys.getenv("ams_pwd")
   )
