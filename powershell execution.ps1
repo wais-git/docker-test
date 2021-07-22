@@ -15,7 +15,7 @@ $db_pwd = (New-Object PSCredential $db_pwd_encrypt).GetNetworkCredential().Passw
 $WAISR_auth_token = (New-Object PSCredential $WAISR_auth_token_encrypt).GetNetworkCredential().Password
 
 # Build image
-docker build --build-arg WAISR_auth_token_pwd=$WAISR_auth_token -t waisdatascience/docker-test .
+docker build --build-arg WAISR_auth_token=$WAISR_auth_token -t waisdatascience/docker-test .
 
 
 # Cant mount full directory as renv doesnt like being mounted into the container, tries to rebuild with linux?
