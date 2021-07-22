@@ -32,17 +32,14 @@ ENV RENV_VERSION 0.13.2
 RUN R -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
-# Install WAISR
-RUN R -e "remotes::install_github('wais-git/WAISR', auth_token = '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')"
-
 # Install neon
 ## Copy neon
 ARG neon_tar="neon/neon_0.1.20.tar.gz"
 COPY ${neon_tar} neon/neon_0.1.20.tar.gz
 
-## Execute neon install & dependencies
-COPY "/Scripts/install_neon.R" "/Scripts/install_neon.R"
-RUN R -e "source('/Scripts/install_neon.R')"
+## Execute neon & WAISR install & dependencies
+COPY "/Scripts/install_custom_packages.R" "/Scripts/install_custom_packages.R"
+RUN R -e "source('/Scripts/install_custom_packages.R')"
 
 # Restore system library
 COPY renv.lock /renv.lock
@@ -56,12 +53,6 @@ COPY /Scripts/sharepoint_mount_test.R /Scripts/sharepoint_mount_test.R
 # Set time zone
 # rocker doesn't allow you to set tz through -e, has to be specified in the .Renviron file that R access, so need to provide this to the image
 COPY .Renviron .Renviron
-
-#ENV TZ=Australia/Perth
-#RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-#RUN echo "Australia/Perth" > /etc/timezone
-#RUN dpkg-reconfigure -f noninteractive tzdata
 
 # Execute script (multiple scripts use & and keep on the same line otherwise will only execute one.
 CMD Rscript /Scripts/sharepoint_mount_test.R & Rscript /Scripts/volumes_test.R & Rscript /Scripts/test_script.R
