@@ -20,7 +20,6 @@ library("dplyr")
 library("keyring")
 library("neon")
 
-
 # Connect and write to database ================================================
 
 # wais_db_con <- odbc::dbConnect(odbc::odbc(), "WAIS_DataWarehouse")
@@ -36,21 +35,21 @@ wais_db_con <- odbc::dbConnect(odbc::odbc(),
                 TrustServerCertificate="no",
                 timeout = 30,
                 Authentication="ActiveDirectoryPassword")
-
+#
 print(wais_db_con)
-
+#
 mtcars %<>%
   mutate(last_update = as.character(Sys.time()))
-
+#
 dbWriteTable(wais_db_con, "mtcars_docker_test", mtcars, overwrite = TRUE)
 
 # WAISR ========================================================================
 
 library("WAISR")
-library("keyring")
-
-# ams_pwd <- key_get("AMS DS", "wais.datascience")
-
+# library("keyring")
+# 
+# # ams_pwd <- key_get("AMS DS", "wais.datascience")
+# 
 pv_comp_report_pull <-
   pull_ams_wais(server = "ams",
                 site = "wais",
@@ -61,7 +60,7 @@ pv_comp_report_pull <-
                 password = Sys.getenv("ams_pwd"),
                 read_type = "read_csv",
                 return_type = "all")
-
+# 
 print(pv_comp_report_pull)
 
 # Neon =========================================================================
@@ -74,7 +73,3 @@ pv_comp_report_pull <-
                         username = Sys.getenv("ams_username"),
                         password = Sys.getenv("ams_pwd")
   )
-
-# Write back to environment ===================================================
-
-write.csv(mtcars, "./Data/mtcars.csv")

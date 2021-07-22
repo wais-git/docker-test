@@ -1,6 +1,6 @@
-# Call version of r you want from rstudio repo (builds on rstudio base image)
+# Call version of r you want from rocker repo (builds on rocker base image)
+# Use precompiled tidyverse image as the basic rversion take forever to compile....
 FROM rocker/tidyverse:4.0.3
-# FROM rocker/r-ver:4.0.3
 
 RUN apt-get update
 
@@ -27,19 +27,13 @@ RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sou
 RUN apt-get update
 RUN ACCEPT_EULA=Y apt-get install msodbcsql17 -y
 
-# Set directories
-# Make directory for exports
-RUN mkdir /Scripts
-RUN mkdir /Data
-RUN mkdir /neon
-
 # Install renv (package management)
 ENV RENV_VERSION 0.13.2
 RUN R -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.org'))"
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
 # Install WAISR
-RUN R -e "remotes::install_github('wais-git/WAISR', auth_token = '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')"
+RUN R -e "remotes::install_github('wais-git/WAISR', auth_token = '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')"
 
 # Install neon
 ## Copy neon
@@ -51,13 +45,23 @@ COPY "/Scripts/install_neon.R" "/Scripts/install_neon.R"
 RUN R -e "source('/Scripts/install_neon.R')"
 
 # Restore system library
-COPY renv.lock /renv.lock 
+COPY renv.lock /renv.lock
 RUN R -e 'renv::restore()'
 
 # Copy script into container "COPY localfile pathinthecontainer"
 COPY /Scripts/test_script.R /Scripts/test_script.R
+COPY /Scripts/volumes_test.R /Scripts/volumes_test.R
+COPY /Scripts/sharepoint_mount_test.R /Scripts/sharepoint_mount_test.R
 
-# Execute script
-CMD Rscript /Scripts/test_script.R
+# Set time zone
+# rocker doesn't allow you to set tz through -e, has to be specified in the .Renviron file that R access, so need to provide this to the image
+COPY .Renviron .Renviron
 
+#ENV TZ=Australia/Perth
+#RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+#RUN echo "Australia/Perth" > /etc/timezone
+#RUN dpkg-reconfigure -f noninteractive tzdata
+
+# Execute script (multiple scripts use & and keep on the same line otherwise will only execute one.
+CMD Rscript /Scripts/sharepoint_mount_test.R & Rscript /Scripts/volumes_test.R & Rscript /Scripts/test_script.R
