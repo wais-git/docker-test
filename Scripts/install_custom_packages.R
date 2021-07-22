@@ -19,4 +19,4 @@ if (length(new_packages) & !identical(new_packages, character(0))) {
 install.packages('neon/neon_0.1.20.tar.gz', repos = NULL)
 
 # WAISR ========================================================================
-remotes::install_github('wais-git/WAISR', auth_token = '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')
+remotes::install_github('wais-git/WAISR', auth_token = Sys.getenv("WAISR_auth_token"))
