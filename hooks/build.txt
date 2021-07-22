@@ -1,1 +1,2 @@
-docker build -t $waisdatascience/docker-test --build-arg WAISR_auth_token=$WAISR_auth_token .
+#!/bin/bash
+docker build -t $docker-test --build-arg WAISR_auth_token=$WAISR_auth_token .
