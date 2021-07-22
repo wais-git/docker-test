@@ -15,7 +15,7 @@ $db_pwd = (New-Object PSCredential $db_pwd_encrypt).GetNetworkCredential().Passw
 $WAISR_auth_token = (New-Object PSCredential $WAISR_auth_token_encrypt).GetNetworkCredential().Password
 
 # Build image
-docker build --build-arg WAISR_auth_token=$WAISR_auth_token -t waisdatascience/docker-test .
+docker build --build-arg WAISR_auth_token_pwd=$WAISR_auth_token -t waisdatascience/docker-test .
 
 
 # Cant mount full directory as renv doesnt like being mounted into the container, tries to rebuild with linux?
@@ -32,7 +32,6 @@ docker run `
 -e ams_pwd=$ams_pwd `
 -e db_username='project_results@wais.org.au' `
 -e db_pwd=$db_pwd `
-
 waisdatascience/docker-test  >> "C:\Users\jfahey-gilmour\OneDrive - WESTERN AUSTRALIAN INSTITUTE OF SPORT INCORPORATED\Documents\GitHub\docker-test\Scripts\docker_test.log" 2>&1
 
 -e WAISR_auth_token=$WAISR_auth_token `
