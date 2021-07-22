@@ -38,6 +38,9 @@ ARG neon_tar="neon/neon_0.1.20.tar.gz"
 COPY ${neon_tar} neon/neon_0.1.20.tar.gz
 
 ## Execute neon & WAISR install & dependencies
+ARG WAISR_auth_token_pwd
+ENV WAISR_auth_token=$WAISR_auth_token_pwd
+
 COPY "/Scripts/install_custom_packages.R" "/Scripts/install_custom_packages.R"
 RUN R -e "source('/Scripts/install_custom_packages.R')"
 
