@@ -3,5 +3,3 @@
 .RData
 .Ruserdata
 .Renviron
-powershell execution.ps1
-*.ps1
